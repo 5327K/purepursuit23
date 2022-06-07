@@ -2,30 +2,40 @@
 #define PURE_PURSUIT_5327K_PATH_H
 
 #include <vector>
+#include <array>
+#include <algorithm>
 
-class Waypoint
+struct Waypoint
 {
-public:
-  double x, y;
+  // x is between -1.8 meters and 1.8 meters (according to the VEX GPS sensor)
+  double x;
+
+  // y is between -1.8 meters and 1.8 meters (according to the VEX GPS sensor)
+  double y;
 
   double dist = -1;
   double curvature = -1;
   double targetV = -1;
-
-  constexpr Waypoint(double x, double y) : x(x), y(y) {}
 };
 
 class Path
 {
+public:
+  using PathVector = std::vector<Waypoint>;
+
 private:
   const double SPACING = 6;
 
-  std::vector<Waypoint> path;
+  PathVector path;
   bool forward;
 
 public:
+  Path(PathVector path, bool forward): path(path), forward(forward){}
 
-  constexpr Path(std::vector<Waypoint> path, bool forward): path(path), forward(forward) {}
+  PathVector &getPathVector() const
+  {
+    return const_cast<PathVector &>(this->path);
+  }
 };
 
 #endif // PURE_PURSUIT_5327K_PATH_H
