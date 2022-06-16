@@ -30,11 +30,11 @@ private:
   bool forward;
 
 public:
-  Path(PathVector path, bool forward): path(path), forward(forward){}
+  Path(PathVector path, bool forward) : path(path), forward(forward) {}
 
-  PathVector &getPathVector() const
+  const PathVector &getPathVector() const
   {
-    return const_cast<PathVector &>(this->path);
+    return this->path;
   }
 };
 

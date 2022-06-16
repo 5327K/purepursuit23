@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <chrono>
 
 #include "inputfield.h"
 
@@ -31,15 +32,19 @@ const double axisWidth = 4;
 const sf::Color backColor{20, 20, 20};
 const sf::Color accentColor{40, 40, 40};
 
-std::string doubleToString(double value)
+std::string doubleToString(double value, int digits = -1)
 {
   std::string str = std::to_string(value);
-  str.erase(str.find_last_not_of('0') + 1, std::string::npos);
-  if (str.back() == '.')
-    str.pop_back();
+  std::size_t decimal = str.find('.');
+  if (digits == -1)
+    str.erase(std::max(str.find_last_not_of('0') + 1,
+                       decimal == std::string::npos ? 0 : decimal + 3),
+              std::string::npos);
+  else
+    str.erase(decimal + digits + 1, std::string::npos);
   return str;
 }
-
+/*
 int main()
 {
   sf::ContextSettings settings;
@@ -110,9 +115,13 @@ int main()
   int selected = 0;
   bool dragging = false;
 
+  sf::Text xText("X: ", font);
+  xText.setFillColor(sf::Color::White);
+  xText.setPosition({90, static_cast<float>(windowSize * 3 / 4 + 0.9_m - 20)});
+
   InputField inputFieldX(100, font);
   inputFieldX.setString(doubleToString(points[selected].x));
-  inputFieldX.setPosition({125, static_cast<float>(windowSize * 3 / 4 + 0.9_m - 20)});
+  inputFieldX.setPosition({125, static_cast<float>(windowSize * 3 / 4 + 0.9_m - 26)});
   inputFieldX.setBackgroundColor(accentColor);
   inputFieldX.setTextFillColor(sf::Color::White);
   // numbers are ascii codes 48 - 57, minus is 45, decimal is 46
@@ -120,7 +129,7 @@ int main()
                                { return (ch == 45) || (ch == 46) || (48 <= ch && ch <= 57); });
 
   inputFieldX.onSubmit([&](const sf::String &oldStr, const sf::String &newStr)
-                             {
+                       {
     try
     {
       // make sure the coordinates are valid; if they aren't, clamp them
@@ -133,12 +142,39 @@ int main()
   
     return sf::String(doubleToString(points[selected].x)); });
 
-  std::string yStr = std::to_string(points[selected].y);
-  yStr = yStr.substr(0, yStr.size() - 4);
-  sf::String inputFieldYStr("Y: " + yStr);
-  sf::Text inputFieldY(inputFieldYStr, font, 30);
-  inputFieldY.setFillColor(sf::Color::White);
-  inputFieldY.setPosition({275, static_cast<float>(windowSize * 3 / 4 + 0.9_m - 20)});
+  sf::Text yText("Y: ", font);
+  yText.setFillColor(sf::Color::White);
+  yText.setPosition({255, static_cast<float>(windowSize * 3 / 4 + 0.9_m - 20)});
+
+  InputField inputFieldY(100, font);
+  inputFieldY.setString(doubleToString(points[selected].y));
+  inputFieldY.setPosition({290, static_cast<float>(windowSize * 3 / 4 + 0.9_m - 26)});
+  inputFieldY.setBackgroundColor(accentColor);
+  inputFieldY.setTextFillColor(sf::Color::White);
+  // numbers are ascii codes 48 - 57, minus is 45, decimal is 46
+  inputFieldY.setCharValidator([](sf::Uint32 ch)
+                               { return (ch == 45) || (ch == 46) || (48 <= ch && ch <= 57); });
+
+  inputFieldY.onSubmit([&](const sf::String &oldStr, const sf::String &newStr)
+                       {
+    try
+    {
+      // make sure the coordinates are valid; if they aren't, clamp them
+      points[selected].x = std::clamp(std::stod(newStr.toAnsiString()), -1.8, 1.8);
+    }
+    catch(const std::invalid_argument &e)
+    { return oldStr; }
+    catch (const std::out_of_range &e)
+    { return oldStr; }
+  
+    return sf::String(doubleToString(points[selected].y)); });
+
+  sf::Text timeText("", font);
+  timeText.setFillColor(sf::Color::White);
+  timeText.setPosition({350, 10});
+
+  double sum = 0;
+  int loops = 0;
 
   while (window.isOpen())
   {
@@ -163,6 +199,7 @@ int main()
             selected = i;
             dragging = true;
             inputFieldX.setString(doubleToString(points[selected].x));
+            inputFieldY.setString(doubleToString(points[selected].y));
             break;
           }
         }
@@ -173,6 +210,7 @@ int main()
         points[selected].x = std::clamp((static_cast<double>(event.mouseMove.x) - windowSize / 2) / pixelsPerMeter, -1.8, 1.8);
         inputFieldX.setString(doubleToString(points[selected].x));
         points[selected].y = std::clamp((static_cast<double>(event.mouseMove.y) - windowSize / 2) / pixelsPerMeter, -1.8, 1.8);
+        inputFieldY.setString(doubleToString(points[selected].y));
       }
 
       if (event.type == sf::Event::MouseButtonReleased &&
@@ -183,6 +221,7 @@ int main()
       }
 
       inputFieldX.checkEvent(event);
+      inputFieldY.checkEvent(event);
     }
 
     window.clear(backColor);
@@ -195,9 +234,18 @@ int main()
 
     const double maxV = 1.5;
 
+    auto start = std::chrono::high_resolution_clock::now();
     const Path path = PathBuilder(true, maxV, 1, 3)
                           .addPoints(points)
                           .build();
+    const std::chrono::duration<double, std::micro> time =
+        duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now() - start);
+
+    sum += time.count();
+    ++loops;
+    std::string s = doubleToString(sum / loops, 2);
+    timeText.setString(std::wstring(s.begin(), s.end()) + L"μs");
 
     for (const auto &point : path.getPathVector())
     {
@@ -236,16 +284,17 @@ int main()
       window.draw(pointShape);
     }
 
+    window.draw(xText);
     window.draw(inputFieldX);
 
-    yStr = std::to_string(points[selected].y);
-    yStr = yStr.substr(0, yStr.size() - 4);
-    inputFieldYStr = yStr;
-    inputFieldY.setString("Y: " + inputFieldYStr);
+    window.draw(yText);
     window.draw(inputFieldY);
+
+    window.draw(timeText);
 
     window.display();
   }
 
   return 0;
 }
+*/
