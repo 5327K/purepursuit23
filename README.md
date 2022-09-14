@@ -2,18 +2,15 @@
 
 ## Requirements
 This was made and tested on `Ubuntu 20.04` on `wsl2`. 
-- C++20 support, specifically [support for `constexpr std::vector`s](https://en.cppreference.com/w/cpp/compiler_support) (scroll down to `constexpr std::vector`). We used GNU GCC v12 for this.
-  - As of the time this was written, `g++12` is not available on Ubuntu. To install it, you can follow [this tutorial](https://www.youtube.com/watch?v=TCcUa1FPU80). Note that building takes *a long time*.
-- Python header files (for [`matplotlib-cpp`](https://github.com/lava/matplotlib-cpp)) - we used Python 3.8.
-  - To install these, you can use the `python3.8-dev` package on Ubuntu (`sudo apt install python3.8-dev`).
-  - Note that this is only for testing and for viewing paths on matplotlib.
+- C++17
 
 ## Usage
+**NOTE**: When developing, make sure ./include contains all necessary PROS API files.
 
 To run (while testing; if you are uploading to the robot, you probably use the PROS cli instead), you can run this command (or something similar):
 ```bash
-# cd ./src
-/path/to/gcc-12/installation/bin/g++ *.cpp *.h -std=c++20 -O2 -I/usr/include/python3.8 -lpython3.8 -I../include -o main
+# cd ./src/gui
+g++ *.cpp *.h -std=c++17 -O2 -I../include -o main
 ./main
 ```
 

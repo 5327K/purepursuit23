@@ -2,9 +2,10 @@
 #include <chrono>
 #include <random>
 
-#include "path.h"
-#include "pathbuilder.h"
+#include "path/path.h"
+#include "path/pathbuilder.h"
 
+/*
 int main()
 {
   std::random_device dev;
@@ -13,7 +14,7 @@ int main()
 
   double sum = 0;
   int iterations = 100;
-  int numPoints = 100000;
+  int numPoints = 10000;
   std::vector<Waypoint> points(numPoints);
   for (int i = 0; i < iterations; ++i)
   {
@@ -34,3 +35,4 @@ int main()
   }
   std::cout << "Average time (" << iterations << " iterations, " << numPoints << " points): " << sum / iterations << " microseconds\n";
 }
+*/
