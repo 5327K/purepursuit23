@@ -1,11 +1,10 @@
-#include <iostream>
 #include <chrono>
 #include <random>
+#include <string>
 
 #include "path/path.h"
 #include "path/pathbuilder.h"
 
-/*
 int main()
 {
   std::random_device dev;
@@ -26,13 +25,16 @@ int main()
                           .addPoints(points)
                           .build();
     const std::chrono::duration<double, std::micro> time =
-        duration_cast<std::chrono::microseconds>(
+        std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::high_resolution_clock::now() - start);
 
     sum += time.count();
 
-    std::cout << "Iteration " << i << "/" << iterations << "...\n";
+    //std::cout << "Iteration " << i << "/" << iterations << "...\n";
   }
-  std::cout << "Average time (" << iterations << " iterations, " << numPoints << " points): " << sum / iterations << " microseconds\n";
+
+  
+  pros::lcd::print("Average time (" + std::to_string(iterations) + " iterations, " + std::to_string(numPoints) + " points): " + std::to_string(sum / iterations) + " microseconds\n");
+
+  //std::cout << "Average time (" << iterations << " iterations, " << numPoints << " points): " << sum / iterations << " microseconds\n";
 }
-*/
