@@ -12,7 +12,7 @@ int main()
 {
   std::random_device dev;
   std::mt19937 rng(dev());
-  std::uniform_real_distribution<double> dist(-1.8, 1.8);
+  std::uniform_real_distribution<double> dist(-1800, 1800);
 
   double sum = 0;
   int iterations = 100;

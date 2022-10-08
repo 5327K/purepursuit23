@@ -8,11 +8,12 @@
 #include <fstream>
 
 struct Waypoint
-{
-  // x is between -1.8 meters and 1.8 meters (according to the VEX GPS sensor)
+{  
+  // TODO: figure out if this is integer or double, and update everything accordingly
+  // x is between -1800 mm and 1800 mm (according to the VEX GPS sensor)
   double x;
 
-  // y is between -1.8 meters and 1.8 meters (according to the VEX GPS sensor)
+  // y is between -1800 mm and 1800 mm (according to the VEX GPS sensor)
   double y;
 
   double dist = -1;

@@ -5,6 +5,7 @@
 #include "pros/motors.h"
 
 #include "../path/path.h"
+#include "../util.h"
 
 class PurePursuit
 {
@@ -12,14 +13,13 @@ private:
   const pros::Gps &GPSsensor;
   const pros::Motor &leftBack, &rightBack, &leftFront, &rightFront;
 
-  struct Util
+  struct PurePursuitUtil
   {
   public:
     const static Waypoint &getClosestPoint(const Path &path, const int &currClosestPoint)
     {
       for (int i = currClosestPoint; i < path.path.size(); ++i)
       {
-        
       }
     };
 
@@ -31,11 +31,10 @@ public:
   PurePursuit(const pros::Gps &GPSsensor, const pros::Motor &leftBack,
               const pros::Motor &rightBack, const pros::Motor &leftFront,
               const pros::Motor &rightFront) : GPSsensor(GPSsensor),
-                                        leftBack(leftBack),
-                                        rightBack(rightBack),
-                                        leftFront(leftFront),
-                                        rightFront(rightFront){};
-
+                                               leftBack(leftBack),
+                                               rightBack(rightBack),
+                                               leftFront(leftFront),
+                                               rightFront(rightFront){};
 
   void follow(const Path &path) const;
 };

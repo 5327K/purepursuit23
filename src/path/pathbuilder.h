@@ -2,6 +2,7 @@
 #define PURE_PURSUIT_5327K_PATH_BUILDER_H
 
 #include "path.h"
+#include "../util.h"
 
 #include <vector>
 #include <cmath>
@@ -12,37 +13,18 @@ private:
   using PathVector = std::vector<Waypoint>;
 
   /* Private methods to help with setting up the final path. */
-  struct Util
+  struct PathBuilderUtil
   {
   private:
-    /* squares a double (a^2 or a*a) */
-    constexpr static double square(const double &a)
-    {
-      return a * a;
-    }
-
-    /* calculates the distance from (0, 0) to a point (or the magnitude of a 
-       vector at the origin) */
-    constexpr static double distance(const double &x, const double &y)
-    {
-      return std::sqrt(square(x) + square(y));
-    }
-
-    /* calculates the distance between two points */
-    constexpr static double distance(const Waypoint &p1, const Waypoint &p2)
-    {
-      return distance(p2.x - p1.x, p2.y - p1.y);
-    }
-
     static double calcPathCurvature(const PathVector &path, const int &i)
     {
       const Waypoint &P = path[i - 1];
       const Waypoint &Q = path[i];
       const Waypoint &R = path[i + 1];
 
-      const double PQ = distance(P, Q);
-      const double QR = distance(Q, R);
-      const double RP = distance(R, P);
+      const double PQ = Util::distance(P, Q);
+      const double QR = Util::distance(Q, R);
+      const double RP = Util::distance(R, P);
 
       const double productOfSides = PQ * QR * RP;
       const double semiPerimeter = (PQ + QR + RP) / 2;
@@ -67,7 +49,7 @@ private:
       const double subY = end.y - start.y;
 
       // magnitude of vector
-      const double dist = distance(subX, subY);
+      const double dist = Util::distance(subX, subY);
 
       // ceil(vector.magnitude() / spacing)
       const int numPoints = std::ceil(dist / spacing);
@@ -131,7 +113,7 @@ private:
       for (int i = 1; i < path.size(); ++i)
       {
         // current dist = last dist + dist between the last point and this one
-        path[i].dist = path[i - 1].dist + distance(path[i - 1], path[i]);
+        path[i].dist = path[i - 1].dist + Util::distance(path[i - 1], path[i]);
       }
     }
 
@@ -155,8 +137,8 @@ private:
 
       for (int i = path.size() - 2; i >= 0; i--)
       {
-        const double dist = distance(path[i + 1], path[i]);
-        const double maxReachableVel = std::sqrt(square(path[i + 1].targetV) +
+        const double dist = Util::distance(path[i + 1], path[i]);
+        const double maxReachableVel = std::sqrt(Util::square(path[i + 1].targetV) +
                                                  2 * maxAccel * dist);
         const double maxVelocity =
             i == 0 ? maxVel : std::min(maxVel, k / calcPathCurvature(path, i));
@@ -206,7 +188,7 @@ public:
                                            maxAccel(maxAccel),
                                            k(k){};
 
-  /* Sets the desired spacing (by default about 6 inches) of the new path 
+  /* Sets the desired spacing (by default about 6 inches) of the new path
      (in meters). */
   PathBuilder &setSpacing(const double &newSpacing)
   {
@@ -221,8 +203,8 @@ public:
     return *this;
   }
 
-  /* Sets weight_smooth (b) and weight_data (a) for the smoothing algorithm. 
-     A value between 0.75 and 0.98 is recommended for "b", and a larger value of 
+  /* Sets weight_smooth (b) and weight_data (a) for the smoothing algorithm.
+     A value between 0.75 and 0.98 is recommended for "b", and a larger value of
      "b" results in a smoother path. "a" is set to 1 - b by default. */
   PathBuilder &setAandB(const double &newB)
   {
@@ -231,7 +213,7 @@ public:
     return *this;
   }
 
-  /* Overrides the defaults and sets the value of "a" to something other than 
+  /* Overrides the defaults and sets the value of "a" to something other than
      1 - b. */
   PathBuilder &overrideA(const double &newA)
   {
@@ -270,21 +252,21 @@ public:
       const Waypoint &currPoint = this->path[i];
       const Waypoint &nextPoint = this->path[i + 1];
 
-      PathVector tmp = Util::injectPoints(currPoint, nextPoint, this->spacing);
+      PathVector tmp = PathBuilderUtil::injectPoints(currPoint, nextPoint, this->spacing);
       path.insert(path.end(), tmp.begin(), tmp.end());
     }
- 
+
     // Add the last point
     path.push_back(path.back());
 
     // Smooth all of the points
     if (this->tolerance != 0)
-      path = Util::smooth(path, tolerance, a, b);
+      path = PathBuilderUtil::smooth(path, tolerance, a, b);
 
     // Populate each point with values
-    path = PathBuilder::Util::setCurvatures(path);
-    Util::setDistances(path);
-    Util::setTargetVel(path, this->maxVel, this->maxAccel, this->k);
+    path = PathBuilderUtil::setCurvatures(path);
+    PathBuilderUtil::setDistances(path);
+    PathBuilderUtil::setTargetVel(path, this->maxVel, this->maxAccel, this->k);
 
     return Path(path, this->forward);
   }
