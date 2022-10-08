@@ -5,6 +5,9 @@
 #include "path/path.h"
 #include "path/pathbuilder.h"
 
+// Used for testing speed of generating points on the VEX brain.
+// Result: Better to generate beforehand and load them in through files.
+
 int main()
 {
   std::random_device dev;
@@ -32,7 +35,6 @@ int main()
 
     //std::cout << "Iteration " << i << "/" << iterations << "...\n";
   }
-
   
   pros::lcd::print("Average time (" + std::to_string(iterations) + " iterations, " + std::to_string(numPoints) + " points): " + std::to_string(sum / iterations) + " microseconds\n");
 
