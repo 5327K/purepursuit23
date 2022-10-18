@@ -21,9 +21,11 @@ private:
   struct PurePursuitUtil
   {
   public:
-    const static std::size_t getClosestPointIndex(const Path &path, const Waypoint &currPos, const std::size_t &currClosestPointIndex)
+    const static std::size_t getClosestPointIndex(const Path &path,
+                                                  const Waypoint &currPos,
+                                                  const std::size_t &currClosestPointIndex)
     {
-      const std::size_t searchUntil = closestPointSearchLimit <= 0 ? path.path.size() : std::min(path.path.size(), currClosestPointIndex + closestPointSearchLimit);
+      const std::size_t searchUntil = closestPointSearchLimit <= 0 ? path.path.size() : std::min(path.path.size(), currClosestPointIndex + closestPointSearchLimit + 1);
 
       double minDist = Util::distanceSq(currPos, path.path[currClosestPointIndex]);
       std::size_t closestPoint = currClosestPointIndex;
