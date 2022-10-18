@@ -2,6 +2,8 @@
 #include <random>
 #include <string>
 
+#include "api.h"
+
 #include "path/path.h"
 #include "path/pathbuilder.h"
 
@@ -12,15 +14,15 @@ int main()
 {
   std::random_device dev;
   std::mt19937 rng(dev());
-  std::uniform_real_distribution<double> dist(-1800, 1800);
+  std::uniform_real_distribution<double> dist(Waypoint::minCoord, Waypoint::maxCoord);
 
   double sum = 0;
   int iterations = 100;
-  int numPoints = 10000;
+  std::size_t numPoints = 10000;
   std::vector<Waypoint> points(numPoints);
   for (int i = 0; i < iterations; ++i)
   {
-    for (int i = 0; i < numPoints; ++i)
+    for (std::size_t i = 0; i < numPoints; ++i)
       points[i] = {dist(rng), dist(rng)};
 
     auto start = std::chrono::high_resolution_clock::now();

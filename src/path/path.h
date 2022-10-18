@@ -8,12 +8,14 @@
 #include <fstream>
 
 struct Waypoint
-{  
-  // TODO: figure out if this is integer or double, and update everything accordingly
-  // x is between -1800 mm and 1800 mm (according to the VEX GPS sensor)
-  double x;
+{
+  // Minimum value for x & y values on the GPS
+  const static double minCoord = -1800;
 
-  // y is between -1800 mm and 1800 mm (according to the VEX GPS sensor)
+  // Maximum value for x & y values on the GPS
+  const static double maxCoord = 1800;
+
+  double x;
   double y;
 
   double dist = -1;
@@ -74,11 +76,11 @@ public:
   static Path read(std::ifstream &fin)
   {
     bool forward;
-    int N;
+    std::size_t N;
     fin >> forward >> N;
 
     PathVector path(N);
-    for (int i = 0; i < N; ++i)
+    for (std::size_t i = 0; i < N; ++i)
       path[i] = Waypoint::read(fin);
 
     return Path(path, forward);

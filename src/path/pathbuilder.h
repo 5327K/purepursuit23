@@ -16,7 +16,7 @@ private:
   struct PathBuilderUtil
   {
   private:
-    static double calcPathCurvature(const PathVector &path, const int &i)
+    static double calcPathCurvature(const PathVector &path, const std::size_t &i)
     {
       const Waypoint &P = path[i - 1];
       const Waypoint &Q = path[i];
@@ -52,7 +52,7 @@ private:
       const double dist = Util::distance(subX, subY);
 
       // ceil(vector.magnitude() / spacing)
-      const int numPoints = std::ceil(dist / spacing);
+      const std::size_t numPoints = std::ceil(dist / spacing);
 
       // get the amount to move each step
       // vector.normalize() * spacing
@@ -62,7 +62,7 @@ private:
       PathVector path;
 
       // add all points
-      for (int i = 0; i < numPoints; ++i)
+      for (std::size_t i = 0; i < numPoints; ++i)
         path.push_back({start.x + dx * i, start.y + dy * i});
 
       // add last point (a copy)
@@ -83,7 +83,7 @@ private:
       while (change >= tolerance)
       {
         change = 0.0;
-        for (int i = 1; i < path.size() - 1; ++i)
+        for (std::size_t i = 1; i < path.size() - 1; ++i)
         {
           const Waypoint &oldPoint = path[i];
           const Waypoint &prevPoint = newPath[i - 1];
@@ -110,7 +110,7 @@ private:
     {
       path[0].dist = 0; // first point has a distance of 0 from the start
 
-      for (int i = 1; i < path.size(); ++i)
+      for (std::size_t i = 1; i < path.size(); ++i)
       {
         // current dist = last dist + dist between the last point and this one
         path[i].dist = path[i - 1].dist + Util::distance(path[i - 1], path[i]);
@@ -124,7 +124,7 @@ private:
       newPath[0].curvature = 0;
       newPath.back().curvature = 0;
 
-      for (int i = 1; i < path.size() - 1; ++i)
+      for (std::size_t i = 1; i < path.size() - 1; ++i)
         newPath[i].curvature = calcPathCurvature(newPath, i);
 
       return newPath;
@@ -135,7 +135,7 @@ private:
     {
       path.back().targetV = 0;
 
-      for (int i = path.size() - 2; i >= 0; i--)
+      for (std::size_t i = path.size() - 2; i >= 0; i--)
       {
         const double dist = Util::distance(path[i + 1], path[i]);
         const double maxReachableVel = std::sqrt(Util::square(path[i + 1].targetV) +
@@ -247,7 +247,7 @@ public:
     PathVector path;
 
     // Inject points between every pair of points
-    for (int i = 0; i < this->path.size() - 1; ++i)
+    for (std::size_t i = 0; i < this->path.size() - 1; ++i)
     {
       const Waypoint &currPoint = this->path[i];
       const Waypoint &nextPoint = this->path[i + 1];
