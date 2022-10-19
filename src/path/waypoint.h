@@ -141,6 +141,15 @@ struct Waypoint
   }
 
 #pragma endregion
+
+#pragma region Other Vector Functions
+
+  double dot(const Waypoint &o) const
+  {
+    return x * o.x + y * o.y;
+  }
+
+#pragma endregion
 };
 
 #endif // PURE_PURSUIT_5327K_WAYPOINT_H
