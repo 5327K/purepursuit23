@@ -11,7 +11,6 @@ This was made and tested on `Ubuntu 20.04` on `wsl2`, with `GCC-9.4.0` and `C++1
 
 To run (while testing; if you are uploading to the robot, you should copy this into an actual PROS project and use the PROS cli instead), you can run this command (or something similar):
 ```bash
-# cd ./src/gui
 g++ *.cpp *.h -std=c++17 -O2 -I../include -o main
 ./main
 ```

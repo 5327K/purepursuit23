@@ -45,25 +45,22 @@ private:
                                    const double &spacing)
     {
       // end - start
-      const double subX = end.x - start.x;
-      const double subY = end.y - start.y;
+      const Waypoint sub = end - start;
 
       // magnitude of vector
-      const double dist = Util::distance(subX, subY);
+      const double dist = Util::distance(sub.x, sub.y);
 
       // ceil(vector.magnitude() / spacing)
       const std::size_t numPoints = std::ceil(dist / spacing);
 
       // get the amount to move each step
-      // vector.normalize() * spacing
-      const double dx = subX / dist * spacing;
-      const double dy = subY / dist * spacing;
+      const Waypoint step = sub / dist * spacing;
 
       PathVector path;
 
       // add all points
       for (std::size_t i = 0; i < numPoints; ++i)
-        path.push_back({start.x + dx * i, start.y + dy * i});
+        path.push_back(start + (step * i));
 
       // add last point (a copy)
       path.push_back(Waypoint(end));
@@ -188,6 +185,7 @@ public:
                                            maxAccel(maxAccel),
                                            k(k){};
 
+#pragma region Setters
   /* Sets the desired spacing (by default about 6 inches) of the new path
      (in meters). */
   PathBuilder &setSpacing(const double &newSpacing)
@@ -240,6 +238,7 @@ public:
     this->path.insert(this->path.end(), points.begin(), points.end());
     return *this;
   }
+#pragma endregion
 
   /* Builds a path completely, including smoothing, injecting points, etc. */
   Path build() const

@@ -3,6 +3,8 @@
 
 #include "api.h"
 
+#include <optional>
+
 #include "../path/path.h"
 #include "../util.h"
 
@@ -43,7 +45,19 @@ private:
       return closestPoint;
     };
 
-    const static Waypoint &getLookaheadPoint(const Path &path);
+    const static std::optional<Waypoint> &calculateLookaheadPoint()
+    {
+
+    }
+
+    const static Waypoint &getLookaheadPoint(const Path &path,
+                                             const Waypoint &currPos,
+                                             const std::size_t &currClosestPointIndex)
+    {
+      const std::size_t lookaheadPoint = getClosestPointIndex(path, currPos, currClosestPointIndex);
+
+    }
+
     const static double calculateCurvatureOfArc(const Path &path);
   };
 
