@@ -4,6 +4,7 @@
 #include "api.h"
 
 #include <cassert>
+#include <cmath>
 
 #include "../path/path.h"
 #include "../util/util.h"
@@ -132,7 +133,36 @@ private:
       return result;
     }
 
-    const static double calculateCurvatureOfArc(const Path &path);
+    const static double calculateCurvatureOfArc(const Path &path,
+                                                const Waypoint &currPos,
+                                                const double &heading,
+                                                const Waypoint &lookahead,
+                                                const double &lookaheadDistance)
+    {
+      const double a = -std::tan(heading);
+      const double b = 1;
+      const double c = (std::tan(heading) * currPos.x) - currPos.y;
+
+      const double x = std::abs(a * lookahead.x + b * lookahead.y + c) / std::sqrt(Util::square(a) + Util::square(b));
+
+      const double cross = (std::sin(heading) * (lookahead.x - currPos.x)) - (std::cos(heading) * (lookahead.y - currPos.y));
+      const double side = cross > 0 ? 1 : -1; // signum function = sign of cross
+
+      const double curvature = (2 * x) / (Util::square(lookaheadDistance));
+      return curvature * side;
+    }
+
+    const static double calculateLeftWheelTargetVelocity(const double &targetRobotVelocity,
+                                                         const double &curvature)
+    {
+      return targetRobotVelocity * ((2 + (robotTrack * curvature))) / 2;
+    }
+
+    const static double calculateRightWheelTargetVelocity(const double &targetRobotVelocity,
+                                                          const double &curvature)
+    {
+      return targetRobotVelocity * ((2 - (robotTrack * curvature))) / 2;
+    }
   };
 
 public:
