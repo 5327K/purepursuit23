@@ -7,8 +7,6 @@
 #include <sstream>
 #include <fstream>
 
-#include "../util.h"
-
 struct Waypoint
 {
   // Minimum value for x & y values on the GPS
@@ -26,128 +24,39 @@ struct Waypoint
 
 #pragma region File / String Input & Output
 
-  friend std::ostream &operator<<(std::ostream &os, const Waypoint &p)
-  {
-    os << p.x << p.y << p.dist << p.curvature << p.targetV;
-    return os;
-  }
+  friend std::ostream &operator<<(std::ostream &os, const Waypoint &p);
 
-  std::string toString() const
-  {
-    std::stringstream ss;
-    ss << (*this);
-    return ss.str();
-  }
+  std::string toString() const;
 
-  static Waypoint read(std::ifstream &fin)
-  {
-    Waypoint result;
-    fin >> result.x >> result.y >> result.dist >> result.curvature >> result.targetV;
-    return result;
-  }
+  static Waypoint read(std::ifstream &fin);
 
 #pragma endregion
 
 #pragma region Operator Overloading
 
-  Waypoint operator+(const Waypoint &o) const
-  {
-    Waypoint newPoint = *this;
-    newPoint.x += o.x;
-    newPoint.y += o.y;
-    return newPoint;
-  }
+  Waypoint operator+(const Waypoint &o) const;
+  Waypoint &operator+=(const Waypoint &o);
+  
+  Waypoint operator-(const Waypoint &o) const;
+  Waypoint &operator-=(const Waypoint &o);
 
-  Waypoint &operator+=(const Waypoint &o)
-  {
-    x += o.x;
-    y += o.y;
-    return *this;
-  }
+  Waypoint operator*(const double &a) const;
+  Waypoint &operator*=(const double &a);
 
-  Waypoint operator-(const Waypoint &o) const
-  {
-    Waypoint newPoint = *this;
-    newPoint.x -= o.x;
-    newPoint.y -= o.y;
-    return newPoint;
-  }
+  Waypoint operator*(const Waypoint &o) const;
+  Waypoint &operator*=(const Waypoint &o);
 
-  Waypoint &operator-=(const Waypoint &o)
-  {
-    x -= o.x;
-    y -= o.y;
-    return *this;
-  }
+  Waypoint operator/(const double &a) const;
+  Waypoint &operator/=(const double &a);
 
-  Waypoint operator*(const double &a) const
-  {
-    Waypoint newPoint = *this;
-    newPoint.x *= a;
-    newPoint.y *= a;
-    return newPoint;
-  }
-
-  Waypoint &operator*=(const double &a)
-  {
-    x *= a;
-    y *= a;
-    return *this;
-  }
-
-  Waypoint operator*(const Waypoint &o) const
-  {
-    Waypoint newPoint = *this;
-    newPoint.x *= o.x;
-    newPoint.y *= o.y;
-    return newPoint;
-  }
-
-  Waypoint &operator*=(const Waypoint &o)
-  {
-    x *= o.x;
-    y *= o.y;
-    return *this;
-  }
-
-  Waypoint operator/(const double &a) const
-  {
-    Waypoint newPoint = *this;
-    newPoint.x /= a;
-    newPoint.y /= a;
-    return newPoint;
-  }
-
-  Waypoint &operator/=(const double &a)
-  {
-    x /= a;
-    y /= a;
-    return *this;
-  }
-
-  Waypoint operator/(const Waypoint &o) const
-  {
-    Waypoint newPoint = *this;
-    newPoint.x /= o.x;
-    newPoint.y /= o.y;
-    return newPoint;
-  }
-
-  Waypoint &operator/=(const Waypoint &o)
-  {
-    x /= o.x;
-    y /= o.y;
-    return *this;
-  }
+  Waypoint operator/(const Waypoint &o) const;
+  Waypoint &operator/=(const Waypoint &o);
 
 #pragma endregion
 
 #pragma region Other Vector Functions
 
-  double dot(const Waypoint &o) const
-  {
-    return x * o.x + y * o.y;
-  }
+  double dot(const Waypoint &o) const;
 
 #pragma endregion
 };

@@ -2,10 +2,12 @@
 #define PURE_PURSUIT_5327K_PATH_BUILDER_H
 
 #include "path.h"
-#include "../util.h"
+#include "waypoint.h"
+#include "../util/util.h"
 
 #include <vector>
 #include <cmath>
+#include <cassert>
 
 class PathBuilder
 {
@@ -34,7 +36,12 @@ private:
                                             (semiPerimeter - RP));
 
       const double radius = productOfSides / (triangleArea * 4);
-      const double curvature = 1 / radius;
+
+      // If radius is infinity/NaN, then the curvature is 0 (straight line).
+      const double curvature = std::isinf(radius) || std::isnan(radius) ? 0 : 1 / radius;
+
+      // TODO: SOMEHOW GETTING NAN HERE!!
+      assert((!std::isnan(curvature), "Curvature cannot be NaN!"));
 
       return curvature;
     }
@@ -132,7 +139,7 @@ private:
     {
       path.back().targetV = 0;
 
-      for (std::size_t i = path.size() - 2; i >= 0; i--)
+      for (int i = path.size() - 2; i >= 0; --i)
       {
         const double dist = Util::distance(path[i + 1], path[i]);
         const double maxReachableVel = std::sqrt(Util::square(path[i + 1].targetV) +
@@ -150,8 +157,8 @@ private:
 
   // defaults to values from PDF
 
-  // defaults to about 6 inches (in meters)
-  double spacing = 0.1524;
+  // defaults to about 6 inches (in millimeters)
+  double spacing = 102.4;
 
   double tolerance = 0.001;
 
@@ -187,7 +194,7 @@ public:
 
 #pragma region Setters
   /* Sets the desired spacing (by default about 6 inches) of the new path
-     (in meters). */
+     (in millimeters). */
   PathBuilder &setSpacing(const double &newSpacing)
   {
     this->spacing = newSpacing;

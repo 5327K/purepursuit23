@@ -29,7 +29,7 @@ public:
   {
     os << p.forward << ' ' << p.path.size() << '\n';
     for (const auto &point : p.path)
-      os << point;
+      os << point << '\n';
 
     return os;
   }

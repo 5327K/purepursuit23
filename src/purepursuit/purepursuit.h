@@ -6,7 +6,7 @@
 #include <cassert>
 
 #include "../path/path.h"
-#include "../util.h"
+#include "../util/util.h"
 
 class PurePursuit
 {
