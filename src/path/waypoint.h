@@ -26,8 +26,11 @@ struct Waypoint
 
   friend std::ostream &operator<<(std::ostream &os, const Waypoint &p);
 
+  /* Returns the string representation of a Waypoint, used for saving a waypoint for later use. */
   std::string toString() const;
 
+  /* Reads the Waypoint::toString representation of a Waypoint and returns the Waypoint object
+     associated with it. */
   static Waypoint read(std::ifstream &fin);
 
 #pragma endregion
@@ -56,6 +59,7 @@ struct Waypoint
 
 #pragma region Other Vector Functions
 
+  /* Computes the dot product between this Waypoint and another Waypoint. */
   double dot(const Waypoint &o) const;
 
 #pragma endregion

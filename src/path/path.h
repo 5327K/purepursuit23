@@ -34,6 +34,7 @@ public:
     return os;
   }
 
+  /* Returns the string representation of a Path, used for saving a path for later use. */
   std::string toString() const
   {
     std::stringstream ss;
@@ -41,6 +42,8 @@ public:
     return ss.str();
   }
 
+  /* Reads the Path::toString representation of a Path and returns the Path object
+     associated with it. */
   static Path read(std::ifstream &fin)
   {
     bool forward;
