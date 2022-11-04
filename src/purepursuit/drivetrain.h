@@ -1,49 +1,47 @@
-#ifndef PURE_PURSUIT_5327K_DRIVE_TRAIN_H
-#define PURE_PURSUIT_5327K_DRIVE_TRAIN_H
+// #ifndef PURE_PURSUIT_5327K_DRIVE_TRAIN_H
+// #define PURE_PURSUIT_5327K_DRIVE_TRAIN_H
 
-#include "api.h"
-#include "abstractdrivetrain.h"
+// #include "api.h"
+// #include "pros/gps.h"
+// #include "pros/motors.h"
 
-class DriveTrain : AbstractDriveTrain
-{
-private:
-  const pros::Gps &GPSsensor;
-  const pros::MotorGroup &left, &right;
+// #include "abstractdrivetrain.h"
 
-  const double gearRatio;
+// class DriveTrain : AbstractDriveTrain
+// {
+// private:
+//   const pros::Gps &GPSsensor;
+//   const pros::Motor_Group &leftM, &rightM;
 
-public:
-  // (motor velocity)(0.6) (2pi(3.25)) = wheel velocity
-  // calculate MOTOR velocity based on what WHEEL should be!
-  // (gear ratios!!)
+//   const double gearRatio;
 
-  /* Creates a new DriveTrain used to steer the robot with the PurePursuit
-     controller.
+// public:
+//   // (motor velocity)(0.6) (2pi(3.25)) = wheel velocity
+//   // calculate MOTOR velocity based on what WHEEL should be!
+//   // (gear ratios!!)
 
-  Arguments:
-  gearRatio - the ratio of gears with the input at the motor and the output
-  at the wheels (including the circumference of the wheels). */
-  DriveTrain(const pros::Gps &GPSsensor, const pros::MotorGroup &left,
-             const pros::MotorGroup &right, const double gearRatio) : GPSsensor(GPSsensor),
-                                                                      left(left),
-                                                                      right(right),
-                                                                      gearRatio(gearRatio){};
+//   /* Creates a new DriveTrain used to steer the robot with the PurePursuit
+//      controller.
 
-  pros::gps_status_s_t getGPSSensorData()
-  {
-    return GPSsensor.get_status();
-  }
+//   Arguments:
+//   gearRatio - the ratio of gears with the input at the motor and the output
+//   at the wheels (including the circumference of the wheels). */
+//   DriveTrain(const pros::Gps &GPSsensor, const pros::MotorGroup &leftM,
+//              const pros::MotorGroup &rightM, const double gearRatio) : GPSsensor(GPSsensor),
+//                                                                       leftM(leftM),
+//                                                                       rightM(rightM),
+//                                                                       gearRatio(gearRatio){};
 
-  void setVelocities(const double &leftWheel, const double &rightWheel)
-  {
-    const double leftMotorVelocity = leftWheel / gearRatio;
-    const double rightMotorVelocity = rightWheel / gearRatio;
+//   pros::gps_status_s_t getGPSSensorData()
+//   {
+//     return GPSsensor.get_status();
+//   }
 
-    leftBack = leftMotorVelocity;
-    leftFront = leftMotorVelocity;
-    rightBack = rightMotorVelocity;
-    rightFront = rightMotorVelocity;
-  }
-}
+//   void setVelocities(const double &leftWheel, const double &rightWheel)
+//   {
+//     leftM = leftWheel / gearRatio;
+//     rightM = rightWheel / gearRatio;
+//   }
+// }
 
-#endif // PURE_PURSUIT_5327K_DRIVE_TRAIN_H
+// #endif // PURE_PURSUIT_5327K_DRIVE_TRAIN_H

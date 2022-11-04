@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html class="w-full h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5327K's Pure Pursuit GUI</title>
+    <script src="/static/js/tailwind.js"></script>
+    <link rel="icon" type="image/x-icon" href="/static/images/icon.png" />
+    <script src="/static/js/index.js" async></script>
+  </head>
+  <body class="w-full h-full">
+    <div
+      class="w-full h-full max-h-full bg-slate-900 p-8 flex flex-col space-y-5"
+    >
+      <h1 class="text-6xl text-white text-center">5327K's Path Planner</h1>
+      <div class="flex flex-col justify-center items-center w-full h-full">
+        <div class="flex flex-row lg:space-x-12 space-x-2 w-9/12">
+          <div
+            class="flex flex-col justify-center items-center space-y-5 w-8/12"
+          >
+            <canvas
+              id="field"
+              width="1000"
+              height="1000"
+              class="block h-auto w-auto max-w-full max-h-full basis-auto inline-block m-0"
+            ></canvas>
+            <div class="w-full basis-auto flex flex-row justify-evenly">
+              <div class="flex flex-row space-x-2 items-center">
+                <label
+                  for="xValue"
+                  class="block text-lg font-medium text-gray-300"
+                  >X:
+                </label>
+                <input
+                  type="text"
+                  id="xValue"
+                  class="disabled:cursor-not-allowed text-center text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-16 p-2.5 bg-gray-700 disabled:bg-gray-800 border-gray-600 text-white focus:ring-blue-500 focus:border-blue-500"
+                  required
+                  disabled
+                />
+                <p class="block text-lg text-gray-300">mm</p>
+              </div>
+              <div class="flex flex-row space-x-2 items-center">
+                <label
+                  for="yValue"
+                  class="block text-lg font-medium text-gray-300"
+                  >Y:
+                </label>
+                <input
+                  type="text"
+                  id="yValue"
+                  class="disabled:cursor-not-allowed text-center text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-16 p-2.5 bg-gray-700 disabled:bg-gray-800 border-gray-600 text-white focus:ring-blue-500 focus:border-blue-500"
+                  required
+                  disabled
+                />
+                <p class="block text-lg text-gray-300">mm</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex w-4/12 h-full bg-gray-700 rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

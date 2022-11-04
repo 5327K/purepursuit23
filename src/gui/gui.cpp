@@ -1,3 +1,5 @@
+// OLD GUI!
+
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
@@ -30,7 +32,7 @@ const double fieldSize = toPixels(Waypoint::maxCoord * 2),
              minCoord = toPixels(Waypoint::minCoord);
 
 const double windowSize = fieldSize;
-const double sidebarSize = 300;
+const double sidebarSize = 200;
 const double axisWidth = 4;
 
 const sf::Color backColor{20, 20, 20};
@@ -49,7 +51,8 @@ std::string doubleToString(double value, int digits = -1)
   return str;
 }
 
-int main()
+//int main()
+int run()
 {
   sf::ContextSettings settings;
   settings.antialiasingLevel = 8;
@@ -100,7 +103,7 @@ int main()
   sidebar.setFillColor(accentColor);
 
   // TODO
-  std::vector<Waypoint> points = {{-0.5, -0.5}, {1, 0}, {0, 0}};
+  std::vector<Waypoint> points = {{1030, 1505}, {-195, 465}, {1570, -770}, {1550, 1005}};
 
   sf::CircleShape pointShape;
   pointShape.setOrigin({2.5, 2.5});
@@ -122,11 +125,11 @@ int main()
 
   sf::Text xText("X: ", font);
   xText.setFillColor(sf::Color::White);
-  xText.setPosition({90, static_cast<float>(windowSize * 3 / 4 + maxCoord / 2 - 20)});
+  xText.setPosition({fieldSize + 10, 8});
 
-  InputField inputFieldX(100, font);
+  InputField inputFieldX(125, font);
   inputFieldX.setString(doubleToString(points[selected].x));
-  inputFieldX.setPosition({125, static_cast<float>(windowSize * 3 / 4 + maxCoord / 2 - 26)});
+  inputFieldX.setPosition({fieldSize + 35, 0});
   inputFieldX.setBackgroundColor(accentColor);
   inputFieldX.setTextFillColor(sf::Color::White);
   // numbers are ascii codes 48 - 57, minus is 45, decimal is 46
@@ -149,11 +152,11 @@ int main()
 
   sf::Text yText("Y: ", font);
   yText.setFillColor(sf::Color::White);
-  yText.setPosition({255, static_cast<float>(windowSize * 3 / 4 + maxCoord / 2 - 20)});
+  yText.setPosition({fieldSize + 10, 48});
 
-  InputField inputFieldY(100, font);
+  InputField inputFieldY(125, font);
   inputFieldY.setString(doubleToString(points[selected].y));
-  inputFieldY.setPosition({290, static_cast<float>(windowSize * 3 / 4 + maxCoord / 2 - 26)});
+  inputFieldY.setPosition({fieldSize + 35, 40});
   inputFieldY.setBackgroundColor(accentColor);
   inputFieldY.setTextFillColor(sf::Color::White);
   // numbers are ascii codes 48 - 57, minus is 45, decimal is 46
