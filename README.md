@@ -3,6 +3,9 @@
 ## Requirements
 This was made and tested on `Ubuntu 20.04` on `wsl2`, with `GCC-9.4.0` and `C++17`.
 
+## Dependencies
+Apart from PROS, this project uses [websocketpp](https://github.com/zaphoyd/websocketpp) for the GUI implementation. Download all files from the `websocketpp` directory in the repository and put them in the `include` directory. Also, it requires the `pthread` library for `websocketpp`.
+
 ## Usage
 **NOTE**: When developing, make sure `./include` contains all necessary PROS API files. To get the files for development, do the following:
 1. Use the [`pros-cli`](https://pros.cs.purdue.edu/v5/getting-started/) to create a new temporary project (`pros conductor new-project tmp`), unless you already have a PROS project with the necessary files.
