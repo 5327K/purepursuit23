@@ -10,25 +10,7 @@ export const clamp = (val: number, min: number, max: number) => {
   return Math.min(Math.max(val, min), max);
 }
 
-export const mmToCanvas = (x: number, y: number, fieldSize: number) => {
-  return {
-    x: mmToPX(x, fieldSize) + fieldSize / 2,
-    y: -mmToPX(y, fieldSize) + fieldSize / 2,
-  };
-};
-
-export const canvasToMM = (rawX: number, rawY: number, field: HTMLCanvasElement) => {
-  const fieldLeft = field.offsetLeft + field.clientLeft,
-    fieldTop = field.offsetTop + field.clientTop;
-
-  const fieldSize = field.clientWidth;
-  const actualFieldSize = field.offsetWidth;
-
-  const normX = (rawX - fieldLeft) / actualFieldSize,
-    normY = (rawY - fieldTop) / actualFieldSize;
-
-  const x = normX * fieldSize - fieldSize / 2,
-    y = -(normY * fieldSize - fieldSize / 2);
-
-  return { x: pxToMM(x, fieldSize), y: pxToMM(y, fieldSize) };
-};
+export const round = (val: number, decimals: number=0) => {
+  const mult = Math.pow(10, decimals);
+  return Math.round(val * mult) / mult;
+}

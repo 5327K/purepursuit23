@@ -40,7 +40,6 @@ private:
       // If radius is infinity/NaN, then the curvature is 0 (straight line).
       const double curvature = std::isinf(radius) || std::isnan(radius) ? 0 : 1 / radius;
 
-      // TODO: SOMEHOW GETTING NAN HERE!!
       assert((!std::isnan(curvature), "Curvature cannot be NaN!"));
 
       return curvature;

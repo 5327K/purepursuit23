@@ -10,7 +10,6 @@ import CanvasPoint from "./CanvasPoint";
 import usePath from "../api/usePath";
 import Api from "../api/api";
 
-
 const Field = () => {
   const wrapper = useRef<HTMLDivElement | null>(null);
   const [stage, setStage] = useState<Konva.Stage | null>(null);
@@ -83,24 +82,34 @@ const Field = () => {
           </Layer>
         </Stage>
 
-        <div className="w-full flex flex-row justify-evenly">
+        <div className="w-full flex flex-row items-center justify-evenly space-x-2">
           <div className="flex flex-row space-x-2 items-center">
             <InputField
               label="X:"
-              initialValue={selected ? points[selected].x.toString() : ""}
-              onValueChange={(value) => {
+              value={selected !== null ? points[selected].x.toFixed(2) : ""}
+              setValue={(value) => {
                 if (!selected) return;
                 const copy = points.slice();
                 copy[selected].x = parseFloat(value);
                 setPoints(copy);
               }}
-              disabled={!selected}
+              disabled={selected === null}
             />
-            <p className="block text-lg text-gray-300">mm</p>
+            <p className="block text-md md:text-lg text-gray-300">mm</p>
           </div>
           <div className="flex flex-row space-x-2 items-center">
-            {/* <InputField label="Y:"  />
-            <p className="block text-lg text-gray-300">mm</p> */}
+            <InputField
+              label="Y:"
+              value={selected !== null ? points[selected].y.toFixed(2) : ""}
+              setValue={(value) => {
+                if (!selected) return;
+                const copy = points.slice();
+                copy[selected].y = parseFloat(value);
+                setPoints(copy);
+              }}
+              disabled={selected === null}
+            />
+            <p className="block text-md md:text-lg text-gray-300">mm</p>
           </div>
         </div>
       </div>
