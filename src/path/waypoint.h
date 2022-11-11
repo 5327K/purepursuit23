@@ -5,7 +5,7 @@
 #include <array>
 #include <algorithm>
 #include <sstream>
-#include <fstream>
+#include <istream>
 
 struct Waypoint
 {
@@ -31,7 +31,7 @@ struct Waypoint
 
   /* Reads the Waypoint::toString representation of a Waypoint and returns the Waypoint object
      associated with it. */
-  static Waypoint read(std::ifstream &fin);
+  static Waypoint read(std::istream &fin);
 
 #pragma endregion
 

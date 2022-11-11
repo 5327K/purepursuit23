@@ -17,7 +17,7 @@ std::string Waypoint::toString() const
   return ss.str();
 }
 
-Waypoint Waypoint::read(std::ifstream &fin)
+Waypoint Waypoint::read(std::istream &fin)
 {
   Waypoint result;
   fin >> result.x >> result.y >> result.dist >> result.curvature >> result.targetV;

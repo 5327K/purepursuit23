@@ -5,7 +5,7 @@
 #include <array>
 #include <algorithm>
 #include <sstream>
-#include <fstream>
+#include <istream>
 
 #include "waypoint.h"
 
@@ -28,7 +28,7 @@ public:
   friend std::ostream &operator<<(std::ostream &os, const Path &p)
   {
     os << p.forward << ' ' << p.path.size() << '\n';
-    for (const auto &point : p.path)
+    for (const Waypoint &point : p.path)
       os << point << '\n';
 
     return os;
@@ -44,15 +44,15 @@ public:
 
   /* Reads the Path::toString representation of a Path and returns the Path object
      associated with it. */
-  static Path read(std::ifstream &fin)
+  static Path read(std::istream &s)
   {
     bool forward;
     std::size_t N;
-    fin >> forward >> N;
+    s >> forward >> N;
 
     PathVector path(N);
     for (std::size_t i = 0; i < N; ++i)
-      path[i] = Waypoint::read(fin);
+      path[i] = Waypoint::read(s);
 
     return Path(path, forward);
   }

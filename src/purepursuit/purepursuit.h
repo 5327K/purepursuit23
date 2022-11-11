@@ -1,180 +1,179 @@
-// #ifndef PURE_PURSUIT_5327K_PURE_PURSUIT_H
-// #define PURE_PURSUIT_5327K_PURE_PURSUIT_H
+#ifndef PURE_PURSUIT_5327K_PURE_PURSUIT_H
+#define PURE_PURSUIT_5327K_PURE_PURSUIT_H
 
-// #include "api.h"
+#include "main.h"
 
-// #include <cassert>
-// #include <cmath>
+#include <cassert>
+#include <cmath>
 
-// #include "../path/path.h"
-// #include "../util/util.h"
+#include "../path/path.h"
+#include "../util/util.h"
 
-// class PurePursuit
-// {
-// private:
-//   const pros::Gps &GPSsensor;
-//   const pros::Motor &leftBack, &rightBack, &leftFront, &rightFront;
+#include "abstractdrivetrain.h"
 
-//   // Limit on number of points to be searched during getClosestPoint.
-//   // Values <= 0 search all points.
-//   const static std::size_t closestPointSearchLimit = 0;
+class PurePursuit
+{
+private:
+  const AbstractDriveTrain driveTrain;
 
-//   std::size_t lastClosestPoint = 0;
+  const int test = 0;
 
-//   struct PurePursuitUtil
-//   {
-//   public:
-//     const static std::size_t getClosestPointIndex(const Path &path,
-//                                                   const Waypoint &currPos,
-//                                                   const std::size_t &currClosestPointIndex)
-//     {
-//       const std::size_t searchUntil = closestPointSearchLimit <= 0 ? path.path.size() : std::min(path.path.size(), currClosestPointIndex + closestPointSearchLimit + 1);
+  // Limit on number of points to be searched during getClosestPoint.
+  // Values <= 0 search all points.
+  const static std::size_t closestPointSearchLimit = 0;
 
-//       double minDist = Util::distanceSq(currPos, path.path[currClosestPointIndex]);
-//       std::size_t closestPoint = currClosestPointIndex;
+  std::size_t lastClosestPoint = 0;
 
-//       for (std::size_t i = currClosestPointIndex + 1; i < path.path.size(); ++i)
-//       {
-//         const double currDist = Util::distanceSq(currPos, path.path[i]);
-//         if (currDist < minDist)
-//         {
-//           closestPoint = currClosestPointIndex;
-//           minDist = currDist;
-//         }
-//       }
+  struct PurePursuitUtil
+  {
+  public:
+    const static std::size_t getClosestPointIndex(const Path &path,
+                                                  const Waypoint &currPos,
+                                                  const std::size_t &currClosestPointIndex)
+    {
+      const std::size_t searchUntil = closestPointSearchLimit <= 0 ? path.path.size() : std::min(path.path.size(), currClosestPointIndex + closestPointSearchLimit + 1);
 
-//       return closestPoint;
-//     };
+      double minDist = Util::distanceSq(currPos, path.path[currClosestPointIndex]);
+      std::size_t closestPoint = currClosestPointIndex;
 
-//     const static double circleLineIntersection(const Waypoint &start,
-//                                                const Waypoint &end,
-//                                                const Waypoint &center,
-//                                                const double &radius)
-//     {
-//       // adapted from https://stackoverflow.com/a/1084899/
+      for (std::size_t i = currClosestPointIndex + 1; i < path.path.size(); ++i)
+      {
+        const double currDist = Util::distanceSq(currPos, path.path[i]);
+        if (currDist < minDist)
+        {
+          closestPoint = currClosestPointIndex;
+          minDist = currDist;
+        }
+      }
 
-//       const Waypoint d = end - start;
-//       const Waypoint f = start - center;
+      return closestPoint;
+    };
 
-//       const double a = d.dot(d);
-//       const double b = 2 * f.dot(d);
-//       const double c = f.dot(f) - Util::square(radius);
+    const static double circleLineIntersection(const Waypoint &start,
+                                               const Waypoint &end,
+                                               const Waypoint &center,
+                                               const double &radius)
+    {
+      // adapted from https://stackoverflow.com/a/1084899/
 
-//       double discriminant = Util::square(b) - 4 * a * c;
-//       if (discriminant < 0)
-//       {
-//         // no intersection, return -1
-//         return -1;
-//       }
+      const Waypoint d = end - start;
+      const Waypoint f = start - center;
 
-//       discriminant = std::sqrt(discriminant);
-//       const double t1 = (-b - discriminant) / (2 * a);
-//       const double t2 = (-b + discriminant) / (2 * a);
+      const double a = d.dot(d);
+      const double b = 2 * f.dot(d);
+      const double c = f.dot(f) - Util::square(radius);
 
-//       if (t1 >= 0 && t1 <= 1)
-//         return t1;
+      double discriminant = Util::square(b) - 4 * a * c;
+      if (discriminant < 0)
+      {
+        // no intersection, return -1
+        return -1;
+      }
 
-//       if (t2 >= 0 && t2 <= 1)
-//         return t2;
+      discriminant = std::sqrt(discriminant);
+      const double t1 = (-b - discriminant) / (2 * a);
+      const double t2 = (-b + discriminant) / (2 * a);
 
-//       return -1;
-//     }
+      if (t1 >= 0 && t1 <= 1)
+        return t1;
 
-//     const static std::optional<const Waypoint> calculateLookaheadPoint(const Path &path,
-//                                                                        const Waypoint &start,
-//                                                                        const Waypoint &end,
-//                                                                        const Waypoint &currPos,
-//                                                                        const double &lookaheadDistance,
-//                                                                        const bool &onLastSegment)
-//     {
-//       const double intersection = circleLineIntersection(start, end, currPos, lookaheadDistance);
+      if (t2 >= 0 && t2 <= 1)
+        return t2;
 
-//       if (intersection == -1 && onLastSegment)
-//         return std::optional<const Waypoint>(path.path[path.path.size() - 1]);
+      return -1;
+    }
 
-//       if (intersection == -1)
-//         return std::nullopt;
+    const static std::optional<const Waypoint> calculateLookaheadPoint(const Path &path,
+                                                                       const Waypoint &start,
+                                                                       const Waypoint &end,
+                                                                       const Waypoint &currPos,
+                                                                       const double &lookaheadDistance,
+                                                                       const bool &onLastSegment)
+    {
+      const double intersection = circleLineIntersection(start, end, currPos, lookaheadDistance);
 
-//       const Waypoint intersectVec = end - start;
-//       const Waypoint segment = intersectVec * intersection;
-//       const Waypoint point = start + segment;
+      if (intersection == -1 && onLastSegment)
+        return std::optional<const Waypoint>(path.path[path.path.size() - 1]);
 
-//       return std::optional<const Waypoint>(point);
-//     }
+      if (intersection == -1)
+        return std::nullopt;
 
-//     const static Waypoint getLookaheadPoint(const Path &path,
-//                                             const Waypoint &currPos,
-//                                             const double &lookaheadDistance,
-//                                             const std::size_t &currClosestPointIndex)
-//     {
-//       const std::size_t closestPointI = getClosestPointIndex(path, currPos, currClosestPointIndex);
+      const Waypoint intersectVec = end - start;
+      const Waypoint segment = intersectVec * intersection;
+      const Waypoint point = start + segment;
 
-//       Waypoint result;
-//       bool found = false;
+      return std::optional<const Waypoint>(point);
+    }
 
-//       for (int i = closestPointI + 1; i < path.path.size(); ++i)
-//       {
-//         const Waypoint &start = path.path[i - 1];
-//         const Waypoint &end = path.path[i];
+    const static Waypoint getLookaheadPoint(const Path &path,
+                                            const Waypoint &currPos,
+                                            const double &lookaheadDistance,
+                                            const std::size_t &currClosestPointIndex)
+    {
+      const std::size_t closestPointI = getClosestPointIndex(path, currPos, currClosestPointIndex);
 
-//         const auto lookaheadPt = calculateLookaheadPoint(path, start, end,
-//                                                          currPos, lookaheadDistance,
-//                                                          i == path.path.size() - 1);
-//         if (lookaheadPt.has_value())
-//         {
-//           result = *lookaheadPt;
-//           found = true;
-//           break;
-//         }
-//       }
+      Waypoint result;
+      bool found = false;
 
-//       assert(("Did not find lookahead point! This should never happen.", found == true));
+      for (int i = closestPointI + 1; i < path.path.size(); ++i)
+      {
+        const Waypoint &start = path.path[i - 1];
+        const Waypoint &end = path.path[i];
 
-//       return result;
-//     }
+        const auto lookaheadPt = calculateLookaheadPoint(path, start, end,
+                                                         currPos, lookaheadDistance,
+                                                         i == path.path.size() - 1);
+        if (lookaheadPt.has_value())
+        {
+          result = *lookaheadPt;
+          found = true;
+          break;
+        }
+      }
 
-//     const static double calculateCurvatureOfArc(const Path &path,
-//                                                 const Waypoint &currPos,
-//                                                 const double &heading,
-//                                                 const Waypoint &lookahead,
-//                                                 const double &lookaheadDistance)
-//     {
-//       const double a = -std::tan(heading);
-//       const double b = 1;
-//       const double c = (std::tan(heading) * currPos.x) - currPos.y;
+      assert(("Did not find lookahead point! This should never happen.", found == true));
 
-//       const double x = std::abs(a * lookahead.x + b * lookahead.y + c) / std::sqrt(Util::square(a) + Util::square(b));
+      return result;
+    }
 
-//       const double cross = (std::sin(heading) * (lookahead.x - currPos.x)) - (std::cos(heading) * (lookahead.y - currPos.y));
-//       const double side = cross > 0 ? 1 : -1; // signum function = sign of cross
+    const static double calculateCurvatureOfArc(const Path &path,
+                                                const Waypoint &currPos,
+                                                const double &heading,
+                                                const Waypoint &lookahead,
+                                                const double &lookaheadDistance)
+    {
+      const double a = -std::tan(heading);
+      const double b = 1;
+      const double c = (std::tan(heading) * currPos.x) - currPos.y;
 
-//       const double curvature = (2 * x) / (Util::square(lookaheadDistance));
-//       return curvature * side;
-//     }
+      const double x = std::abs(a * lookahead.x + b * lookahead.y + c) / std::sqrt(Util::square(a) + Util::square(b));
 
-//     const static double calculateLeftWheelTargetVelocity(const double &targetRobotVelocity,
-//                                                          const double &curvature)
-//     {
-//       return targetRobotVelocity * ((2 + (robotTrack * curvature))) / 2;
-//     }
+      const double cross = (std::sin(heading) * (lookahead.x - currPos.x)) - (std::cos(heading) * (lookahead.y - currPos.y));
+      const double side = cross > 0 ? 1 : -1; // signum function = sign of cross
 
-//     const static double calculateRightWheelTargetVelocity(const double &targetRobotVelocity,
-//                                                           const double &curvature)
-//     {
-//       return targetRobotVelocity * ((2 - (robotTrack * curvature))) / 2;
-//     }
-//   };
+      const double curvature = (2 * x) / (Util::square(lookaheadDistance));
+      return curvature * side;
+    }
 
-// public:
-//   PurePursuit(const pros::Gps &GPSsensor, const pros::Motor &leftBack,
-//               const pros::Motor &rightBack, const pros::Motor &leftFront,
-//               const pros::Motor &rightFront) : GPSsensor(GPSsensor),
-//                                                leftBack(leftBack),
-//                                                rightBack(rightBack),
-//                                                leftFront(leftFront),
-//                                                rightFront(rightFront){};
+    const static double calculateLeftWheelTargetVelocity(const double &targetRobotVelocity,
+                                                         const double &robotTrack,
+                                                         const double &curvature)
+    {
+      return targetRobotVelocity * ((2 + (robotTrack * curvature))) / 2;
+    }
 
-//   void follow(const Path &path) const;
-// };
+    const static double calculateRightWheelTargetVelocity(const double &targetRobotVelocity,
+                                                          const double &robotTrack,
+                                                          const double &curvature)
+    {
+      return targetRobotVelocity * ((2 - (robotTrack * curvature))) / 2;
+    }
+  };
 
-// #endif // PURE_PURSUIT_5327K_PURE_PURSUIT_H
+public:
+  PurePursuit(const AbstractDriveTrain driveTrain) : driveTrain(driveTrain){};
+
+  void follow(const Path &path) const;
+};
+
+#endif // PURE_PURSUIT_5327K_PURE_PURSUIT_H
