@@ -5,7 +5,9 @@
 
 #include "abstractdrivetrain.h"
 
-class DriveTrain : AbstractDriveTrain
+// TODO: PID? (is this handled by purepursuit already? need to check)
+
+class DriveTrain : public AbstractDriveTrain
 {
 private:
   const pros::Gps &GPSsensor;
