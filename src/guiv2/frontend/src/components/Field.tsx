@@ -15,7 +15,7 @@ const Field = () => {
   const [stage, setStage] = useState<Konva.Stage | null>(null);
   const [fieldSize, setFieldSize] = useState<number>(1000);
 
-  const [points, setPoints] = useState<Point[]>([{ x: 0, y: 100 }]);
+  const [points, setPoints] = useState<Point[]>([{ x: 0, y: 0.2 }]);
   const [selected, setSelected] = useState<number | null>(null);
 
   const path = usePath(points);
@@ -86,7 +86,7 @@ const Field = () => {
           <div className="flex flex-row space-x-2 items-center">
             <InputField
               label="X:"
-              value={selected !== null ? points[selected].x.toFixed(2) : ""}
+              value={selected !== null ? points[selected].x.toFixed(4) : ""}
               setValue={(value) => {
                 if (!selected) return;
                 const copy = points.slice();
@@ -95,12 +95,12 @@ const Field = () => {
               }}
               disabled={selected === null}
             />
-            <p className="block text-md md:text-lg text-gray-300">mm</p>
+            <p className="block text-md md:text-lg text-gray-300">m</p>
           </div>
           <div className="flex flex-row space-x-2 items-center">
             <InputField
               label="Y:"
-              value={selected !== null ? points[selected].y.toFixed(2) : ""}
+              value={selected !== null ? points[selected].y.toFixed(4) : ""}
               setValue={(value) => {
                 if (!selected) return;
                 const copy = points.slice();
@@ -109,7 +109,7 @@ const Field = () => {
               }}
               disabled={selected === null}
             />
-            <p className="block text-md md:text-lg text-gray-300">mm</p>
+            <p className="block text-md md:text-lg text-gray-300">m</p>
           </div>
         </div>
       </div>

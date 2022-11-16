@@ -1,9 +1,9 @@
-export const pxToMM = (px: number, fieldSize: number) => {
-  return (px / (fieldSize / 2)) * 1800 - 1800;
+export const pxToM = (px: number, fieldSize: number) => {
+  return (px / (fieldSize / 2)) * 1.8 - 1.8;
 };
 
-export const mmToPX = (mm: number, fieldSize: number) => {
-  return ((mm + 1800) * (fieldSize / 2)) / 1800;
+export const mToPX = (m: number, fieldSize: number) => {
+  return ((m + 1.8) * (fieldSize / 2)) / 1.8;
 };
 
 export const clamp = (val: number, min: number, max: number) => {

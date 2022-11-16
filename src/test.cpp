@@ -20,6 +20,8 @@ const double gearRatio = 0.6 * 2 * PI * 3.25;
 
 const DriveTrain driveTrain(gps, leftM, rightM, gearRatio);
 
+// TODO: 1800 mm -> 1.8 m because PROS documentation sucks!!1!11
+
 // TODO: it seems like calculating m/s will not work due to the
 // extreme complexity of converting voltage to actual velocity - 
 // probably have to refactor the code to only use voltages, which

@@ -10,10 +10,10 @@
 struct Waypoint
 {
   // Minimum value for x & y values on the GPS
-  constexpr static double minCoord = -1800;
+  constexpr static double minCoord = -1.8;
 
   // Maximum value for x & y values on the GPS
-  constexpr static double maxCoord = 1800;
+  constexpr static double maxCoord = 1.8;
 
   double x;
   double y;

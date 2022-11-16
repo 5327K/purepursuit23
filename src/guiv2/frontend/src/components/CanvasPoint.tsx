@@ -1,6 +1,6 @@
 import { Circle } from "react-konva";
 import { Point } from "../types/types";
-import { clamp, mmToPX, pxToMM, round } from "../util/conversion";
+import { clamp, mToPX, pxToM, round } from "../util/conversion";
 
 const CanvasPoint = ({
   fieldSize,
@@ -23,8 +23,8 @@ const CanvasPoint = ({
       fill="red"
       stroke={selected === index ? "white" : "black"}
       strokeWidth={selected === index ? fieldSize / 250 : fieldSize / 300}
-      x={mmToPX(points[index].x, fieldSize)}
-      y={mmToPX(points[index].y, fieldSize)}
+      x={mToPX(points[index].x, fieldSize)}
+      y={mToPX(-points[index].y, fieldSize)}
       draggable={true}
       dragBoundFunc={(pos) => {
         return {
@@ -37,8 +37,8 @@ const CanvasPoint = ({
       onDragMove={(evt) => {
         const copy = points.slice();
         copy[index] = {
-          x: round(pxToMM(evt.target.attrs.x, fieldSize), 2),
-          y: round(pxToMM(evt.target.attrs.y, fieldSize), 2),
+          x: round(pxToM(evt.target.attrs.x, fieldSize), 4),
+          y: round(-pxToM(evt.target.attrs.y, fieldSize), 4),
         };
         console.log(copy[index]);
         setPoints(copy);
