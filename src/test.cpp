@@ -1,55 +1,78 @@
-#include "path/path.h"
-#include "path/pathbuilder.h"
+// #include "path/path.h"
+// #include "path/pathbuilder.h"
 
-#include "purepursuit/purepursuit.h"
-#include "purepursuit/drivetrain.h"
+// #include "purepursuit/purepursuit.h"
+// #include "purepursuit/simulateddrivetrain.h"
 
-#include "okapi/api.hpp"
+// // #include "okapi/api.hpp"
 
-#include <iostream>
-#include <sstream>
+// #include <iostream>
+// #include <sstream>
 
-const double PI = 3.141592653589793238462643383279502884;
+// #include <chrono>
+// #include <thread>
 
-pros::GPS gps(1);
+// const double PI = 3.141592653589793238462643383279502884;
 
-pros::MotorGroup leftM({2, 3});
-pros::MotorGroup rightM({4, 5});
+// // x = 3 inch
+// // y = 6 inch
+// // pros::GPS gps(9, 0.0762, 0.1524);
 
-const double gearRatio = 0.6 * 2 * PI * 3.25;
+// // pros::MotorGroup leftM({-4, 5, -6});
+// // pros::MotorGroup rightM({1, -2, 3});
 
-const DriveTrain driveTrain(gps, leftM, rightM, gearRatio);
+// // const double gearRatio = 0.6 * PI * 3.25;
 
-// TODO: 1800 mm -> 1.8 m because PROS documentation sucks!!1!11
+// // DriveTrain driveTrain(gps, leftM, rightM, gearRatio);
 
-// TODO: it seems like calculating m/s will not work due to the
-// extreme complexity of converting voltage to actual velocity - 
-// probably have to refactor the code to only use voltages, which
-// gives rise to the problem of only integer voltages - maybe calculate
-// everything in doubles and then convert to closest integer?
+// // TODO: 1800 mm -> 1.8 m because PROS documentation sucks!!1!11
 
-// TODO: max velocities might not work properly (scaling in m/s and then back to -127 to 127 is scuffed)
+// // TODO: it seems like calculating m/s will not work due to the
+// // extreme complexity of converting voltage to actual velocity -
+// // probably have to refactor the code to only use voltages, which
+// // gives rise to the problem of only integer voltages - maybe calculate
+// // everything in doubles and then convert to closest integer?
 
-int main()
-{
-  // run on computer
-  Path path = PathBuilder(true, 100, 1, 3)
-                  .addPoints({{0, 0}, {100, 100}, {-100, -100}})
-                  .build();
+// // TODO: max velocities might not work properly (scaling in m/s and then back to -127 to 127 is scuffed)
 
-  // saved to a file (would be ofstream, then upload to microSD card )
-  std::stringstream ss;
-  ss << path;
+// int main()
+// {
+//   using namespace std::this_thread;
+//   using namespace std::chrono;
 
-  // actual code on the robot starts here (barring the `assert` statement)
-  // on the actual robot, `ss` would be a file stream (https://pros.cs.purdue.edu/v5/tutorials/topical/filesystem.html
-  // but with ifstream/ofstream)
-  Path newPath = Path::read(ss);
+//   // run on computer
+//   Path path = PathBuilder(true, 110, 20, 3)
+//                   .addPoints({{-0.1, 0}, {0.5, 0.5}, {-0.5, -0.5}})
+//                   .build();
 
-  assert(path.toString() == newPath.toString());
+//   // saved to a file (would be ofstream, then upload to microSD card )
+//   std::stringstream ss;
+//   ss << path;
 
-  PurePursuit pursuit(driveTrain);
-  pursuit.follow(newPath);
+//   std::cout << path;
 
-  return 0;
-}
+//   // actual code on the robot starts here (barring the `assert` statement)
+//   // on the actual robot, `ss` would be a file stream (https://pros.cs.purdue.edu/v5/tutorials/topical/filesystem.html
+//   // but with ifstream/ofstream)
+//   Path newPath = Path::read(ss);
+
+//   assert(path.toString() == newPath.toString());
+
+//   SimulatedDriveTrain driveTrain;
+
+//   PurePursuit pursuit(driveTrain);
+
+//   int closestPt = 0;
+//   while (true)
+//   {
+//     if (pursuit.tick(newPath, closestPt))
+//       break;
+//     driveTrain.tick(0.005);
+//     sleep_for(milliseconds(5));
+//   }
+
+//   std::cout << "finished \n";
+
+
+//   return 0;
+// }

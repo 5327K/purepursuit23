@@ -29,16 +29,21 @@ public:
                                                                  rightM(rightM),
                                                                  gearRatio(gearRatio){};
 
-  pros::c::gps_status_s_t getGPSSensorData()
+  pros::c::gps_status_s_t getGPSSensorData() const
   {
     return GPSsensor.get_status();
   }
 
-  void setVelocities(const double &leftWheel, const double &rightWheel, const double &maxVelocity)
+  void setVelocities(const double &leftWheel, const double &rightWheel)
   {
     // TODO: do negative values (i.e. driving backwards) work?
-    leftM = (leftWheel / gearRatio) / maxVelocity * 127;
-    rightM = (rightWheel / gearRatio) / maxVelocity * 127;
+    leftM = leftWheel;
+    rightM = rightWheel;
+  }
+
+  std::pair<double, double> getWheelVelocities() const
+  {
+    return {leftM.get_target_velocities()[0], rightM.get_target_velocities()[0]};
   }
 };
 

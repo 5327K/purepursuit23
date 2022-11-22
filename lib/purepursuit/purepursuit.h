@@ -14,9 +14,11 @@
 class PurePursuit
 {
 private:
-  const AbstractDriveTrain driveTrain;
+  AbstractDriveTrain &driveTrain;
 
-  const int test = 0;
+  constexpr static double lookaheadDistance = 0.05;
+  constexpr static double robotTrack = 0.254;
+  constexpr static double feedbackMultiplier = 0.01;
 
   // Limit on number of points to be searched during getClosestPoint.
   // Values <= 0 search all points.
@@ -32,6 +34,7 @@ private:
                                                   const std::size_t &currClosestPointIndex)
     {
       const std::size_t searchUntil = closestPointSearchLimit <= 0 ? path.path.size() : std::min(path.path.size(), currClosestPointIndex + closestPointSearchLimit + 1);
+      std::cout << searchUntil << '\n';
 
       double minDist = Util::distanceSq(currPos, path.path[currClosestPointIndex]);
       std::size_t closestPoint = currClosestPointIndex;
@@ -83,7 +86,7 @@ private:
       return -1;
     }
 
-    const static std::optional<const Waypoint> calculateLookaheadPoint(const Path &path,
+    const static std::pair<std::optional<const Waypoint>, bool> calculateLookaheadPoint(const Path &path,
                                                                        const Waypoint &start,
                                                                        const Waypoint &end,
                                                                        const Waypoint &currPos,
@@ -93,47 +96,48 @@ private:
       const double intersection = circleLineIntersection(start, end, currPos, lookaheadDistance);
 
       if (intersection == -1 && onLastSegment)
-        return std::optional<const Waypoint>(path.path[path.path.size() - 1]);
+        return {std::optional<const Waypoint>(path.path[path.path.size() - 1]), true};
 
       if (intersection == -1)
-        return std::nullopt;
+        return {std::nullopt, false};
 
       const Waypoint intersectVec = end - start;
       const Waypoint segment = intersectVec * intersection;
       const Waypoint point = start + segment;
 
-      return std::optional<const Waypoint>(point);
+      return {std::optional<const Waypoint>(point), false};
     }
 
-    const static Waypoint getLookaheadPoint(const Path &path,
+    const static std::pair<Waypoint, bool> getLookaheadPoint(const Path &path,
                                             const Waypoint &currPos,
                                             const double &lookaheadDistance,
-                                            const std::size_t &currClosestPointIndex)
+                                            const std::size_t &closestPointI)
     {
-      const std::size_t closestPointI = getClosestPointIndex(path, currPos, currClosestPointIndex);
-
+      // TODO: return index so an end condition can be set properly
       Waypoint result;
       bool found = false;
+      bool isLast = false;
 
       for (int i = closestPointI + 1; i < path.path.size(); ++i)
       {
         const Waypoint &start = path.path[i - 1];
         const Waypoint &end = path.path[i];
 
-        const auto lookaheadPt = calculateLookaheadPoint(path, start, end,
+        const auto [lookaheadPt, isEnd] = calculateLookaheadPoint(path, start, end,
                                                          currPos, lookaheadDistance,
                                                          i == path.path.size() - 1);
         if (lookaheadPt.has_value())
         {
           result = *lookaheadPt;
           found = true;
+          isLast = isEnd;
           break;
         }
       }
 
       assert(("Did not find lookahead point! This should never happen.", found == true));
 
-      return result;
+      return {result, isLast};
     }
 
     const static double calculateCurvatureOfArc(const Path &path,
@@ -171,9 +175,10 @@ private:
   };
 
 public:
-  PurePursuit(const AbstractDriveTrain driveTrain) : driveTrain(driveTrain){};
+  PurePursuit(AbstractDriveTrain &driveTrain) : driveTrain(driveTrain){};
 
-  void follow(const Path &path) const;
+  bool tick(const Path &path, int &closestPt);
+  void follow(const Path &path);
 };
 
 #endif // PURE_PURSUIT_5327K_PURE_PURSUIT_H

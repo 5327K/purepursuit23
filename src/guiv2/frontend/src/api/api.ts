@@ -1,13 +1,15 @@
 import { Point } from "../types/types";
 
 class Api {
-  private socket: WebSocket;  
+  private socket: WebSocket;
   private connected = false;
 
   private readonly possibleReponses = ["updated-path"];
 
   public readonly callbacks: {
-    [key in typeof this.possibleReponses[number]]: ((tokens: string[]) => void)[];
+    [key in typeof this.possibleReponses[number]]: ((
+      msg: string
+    ) => void)[];
   } = this.possibleReponses.reduce((obj: typeof this.callbacks, key) => {
     obj[key] = [];
     return obj;
@@ -22,8 +24,7 @@ class Api {
       console.log("Connected to socket successfully!");
       this.connected = true;
 
-      for (const callback of this.onopen)
-        callback(e);
+      for (const callback of this.onopen) callback(e);
     };
 
     this.socket.onmessage = (msg: MessageEvent<any>) => {
@@ -32,7 +33,7 @@ class Api {
       if (tokens[0] === "ERROR") {
         throw new Error(`Something went wrong. Message: "${tokens[1]}"`);
       } else {
-        this.handleResponse(tokens);
+        this.handleResponse(tokens[0], msg.data as string);
       }
     };
 
@@ -43,20 +44,29 @@ class Api {
 
   public isConnected = () => {
     return this.connected;
-  }
+  };
 
-  private handleResponse = (tokens: string[]) => {
-    if (tokens[0] in this.callbacks) {
-      for (const callback of this.callbacks[tokens[0]]) {
-        callback(tokens);
+  private handleResponse = (type: string, msg: string) => {
+    if (type in this.callbacks) {
+      for (const callback of this.callbacks[type]) {
+        callback(msg);
       }
     } else {
-      throw new Error(`Unrecognized message recieved. Tokens: ${tokens}`)
+      throw new Error(`Unrecognized message recieved. Message: ${msg}`);
     }
   };
 
-  public pathUpdated = (points: Point[]) => {
-    this.socket.send("update-path");
+  public pathUpdated = (
+    forwards: boolean,
+    maxVel: number,
+    maxAccel: number,
+    k: number,
+    points: Point[]
+  ) => {
+    this.socket.send(
+      `update-path ${forwards ? "1" : "0"} ${maxVel} ${maxAccel} ${k} ${points.length}\n` +
+        points.map((pt) => `${pt.x} ${pt.y}`).join("\n")
+    );
   };
 }
 

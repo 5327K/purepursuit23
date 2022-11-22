@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import Konva from "konva";
-import { Image as KonvaImage, Layer, Stage } from "react-konva";
+import { Circle, Image as KonvaImage, Layer, Stage } from "react-konva";
 
 import fieldImagePath from "../assets/field-full.png";
 import { Point } from "../types/types";
@@ -9,13 +9,19 @@ import InputField from "./InputField";
 import CanvasPoint from "./CanvasPoint";
 import usePath from "../api/usePath";
 import Api from "../api/api";
+import { mToPX } from "../util/conversion";
 
 const Field = () => {
   const wrapper = useRef<HTMLDivElement | null>(null);
   const [stage, setStage] = useState<Konva.Stage | null>(null);
   const [fieldSize, setFieldSize] = useState<number>(1000);
 
-  const [points, setPoints] = useState<Point[]>([{ x: 0, y: 0.2 }]);
+  const [points, setPoints] = useState<Point[]>([
+    { x: 0, y: 0.2 },
+    { x: 0, y: -0.2 },
+    { x: 0, y: -0.5 },
+    { x: -0.1, y: 0.7 },
+  ]);
   const [selected, setSelected] = useState<number | null>(null);
 
   const path = usePath(points);
@@ -66,6 +72,18 @@ const Field = () => {
               width={fieldSize}
               height={fieldSize}
             />
+
+            {path?.map((pt, idx) => (
+              <Circle
+                radius={fieldSize / 150}
+                // TODO: remove hardcoded maxVal
+                fill={`rgb(0, 0, ${(1 - pt.targetV / 110) * 255})`}
+                key={idx}
+                x={mToPX(pt.x, fieldSize)}
+                y={mToPX(-pt.y, fieldSize)}
+              />
+            ))}
+
             {points.map((_, idx) => {
               return (
                 <CanvasPoint

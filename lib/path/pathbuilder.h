@@ -8,6 +8,7 @@
 #include <vector>
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 class PathBuilder
 {
@@ -156,8 +157,8 @@ private:
 
   // defaults to values from PDF
 
-  // defaults to about 6 inches (in millimeters)
-  double spacing = 102.4;
+  // defaults to about 6 inches (in meters)
+  double spacing = 0.1524;
 
   double tolerance = 0.001;
 
@@ -193,7 +194,7 @@ public:
 
 #pragma region Setters
   /* Sets the desired spacing (by default about 6 inches) of the new path
-     (in millimeters). */
+     (in meters). */
   PathBuilder &setSpacing(const double &newSpacing)
   {
     this->spacing = newSpacing;
@@ -262,7 +263,8 @@ public:
     }
 
     // Add the last point
-    path.push_back(path.back());
+    if (this->path.size() != 0)
+      path.push_back(this->path.back());
 
     // Smooth all of the points
     if (this->tolerance != 0)

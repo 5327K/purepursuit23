@@ -1,25 +1,46 @@
 import { useContext, useEffect, useState } from "react";
 import { ApiContext } from "../App";
-import { Point } from "../types/types";
+import { Point, Waypoint } from "../types/types";
 
 const usePath = (points: Point[]) => {
-  const [path, setPath] = useState<Point[] | null>(null);
+  const [path, setPath] = useState<Waypoint[] | null>(null);
   const api = useContext(ApiContext);
 
+  // TODO: remove hardcoding of attributes apart from `points`
   useEffect(() => {
     if (!api.isConnected()) return;
 
     console.log("sending request");
-    api.pathUpdated(points);
+    api.pathUpdated(true, 110, 20, 3, points);
   }, [points]);
 
   useEffect(() => {
     api.onopen.push(() => {
-      api.pathUpdated(points);
+      api.pathUpdated(true, 110, 20, 3, points);
     });
 
-    api.callbacks["updated-path"].push((tokens) => {
-      console.log(tokens);
+    api.callbacks["updated-path"].push((msg) => {
+      const lines = msg.split("\n");
+
+      const line1 = lines[0].split(" ");
+      const N = parseInt(line1[1]);
+
+      const pts: Waypoint[] = [];
+      for (let i = 0; i < N; ++i) {
+        const line = lines[i + 1].split(" ");
+
+        pts.push({
+          x: parseFloat(line[0]),
+          y: parseFloat(line[1]),
+          dist: parseFloat(line[2]),
+          curvature: parseFloat(line[3]),
+          targetV: parseFloat(line[4])
+        });
+      }
+
+      console.log(pts);
+
+      setPath(pts);
     });
   }, []);
 
