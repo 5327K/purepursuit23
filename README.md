@@ -30,4 +30,6 @@ I personally used Visual Studio Code's extension, [Code Runner](https://marketpl
 ## Resources Used
 - [FRC Team 1712's Paper on Pure Pursuit](https://www.chiefdelphi.com/uploads/default/original/3X/b/e/be0e06de00e07db66f97686505c3f4dde2e332dc.pdf) (from [this forum post](https://www.chiefdelphi.com/t/paper-implementation-of-the-adaptive-pure-pursuit-controller/166552)), a copy of which can be found [in this repository](paper.pdf).
 - [FRC Team 3256's implementation in Java (of the above paper)](https://github.com/Team3256/warriorlib/tree/master/src/main/java/frc/team3256/warriorlib/auto/purepursuit).
+- `arimb`'s [implementation in Python](https://github.com/arimb/PurePursuit).
+- Various other StackOverflow users (linked in comments in code).
 - [The PROS v5 API Documentation](https://pros.cs.purdue.edu/v5/index.html).
