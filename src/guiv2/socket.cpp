@@ -88,8 +88,8 @@ void handleSimulateRobot(std::stringstream &ss, server_t *s, websocketpp::connec
 
     simulating = true;
 
-    const double angle = std::tan((currPath.path[1].y - currPath.path[0].y) / (currPath.path[1].x - currPath.path[0].x));
-    SimulatedDriveTrain driveTrain({currPath.path[0].x, currPath.path[0].y, Util::PI / 2 - angle});
+    const double angle = std::atan((currPath.path[1].y - currPath.path[0].y) / (currPath.path[1].x - currPath.path[0].x));
+    SimulatedDriveTrain driveTrain({currPath.path[0].x, currPath.path[0].y, Util::PI / 2 - angle + Util::PI / 8});
     PurePursuit pursuit(driveTrain, 20);
 
     for (int i = 0;; ++i)
