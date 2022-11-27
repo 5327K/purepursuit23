@@ -9,6 +9,8 @@
 class Util
 {
 public:
+  constexpr static double PI = 3.141592653589793238462643383279502884197169399;
+
   /* squares a double (a^2 or a*a) */
   const static double square(const double &a)
   {

@@ -2,11 +2,14 @@
 
 #include "util/util.h"
 
+#include <iomanip>
+
 #pragma region File / String Input & Output
 
 std::ostream &operator<<(std::ostream &os, const Waypoint &p)
 {
-  os << p.x << ' ' << p.y << ' ' << p.dist << ' ' << p.curvature << ' ' << p.targetV;
+  std::streamsize ss = os.precision();
+  os << std::setprecision(10) << p.x << ' ' << p.y << ' ' << p.targetV << std::setprecision(ss);
   return os;
 }
 
@@ -20,7 +23,9 @@ std::string Waypoint::toString() const
 Waypoint Waypoint::read(std::istream &fin)
 {
   Waypoint result;
-  fin >> result.x >> result.y >> result.dist >> result.curvature >> result.targetV;
+  result.dist = -1;
+  result.curvature = -1;
+  fin >> result.x >> result.y >> result.targetV;
   return result;
 }
 
@@ -122,9 +127,9 @@ Waypoint &Waypoint::operator/=(const Waypoint &o)
 
 #pragma region Other Vector Functions
 
-  double Waypoint::dot(const Waypoint &o) const
-  {
-    return x * o.x + y * o.y;
-  }
+double Waypoint::dot(const Waypoint &o) const
+{
+  return x * o.x + y * o.y;
+}
 
 #pragma endregion

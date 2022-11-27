@@ -3,10 +3,12 @@
 
 #include "abstractdrivetrain.h"
 
+#include <sstream>
+
 struct SimulatedRobotState
 {
   // track width
-  const double width = 0.254;
+  const double width = 25.4;
 
   // center of robot
   double x, y;
@@ -19,9 +21,25 @@ struct SimulatedRobotState
 
   void tick(double dt)
   {
-    x += (velL + velR) / 2 * dt * std::sin(yaw);
-    y += (velL + velR) / 2 * dt * std::cos(yaw);
-    yaw += std::atan((velL + velR) / width * dt);
+    const double v = (velL + velR) / 2;
+    const double w = (velL - velR) / width;
+
+    x += v * dt * std::sin(yaw);
+    y += v * dt * std::cos(yaw);
+    yaw += std::atan(w * dt);
+  }
+
+  friend std::ostream &operator<<(std::ostream &os, const SimulatedRobotState &s)
+  {
+    os << s.x << ' ' << s.y << ' ' << s.yaw << ' ' << s.velL << ' ' << s.velR;
+    return os;
+  }
+
+  std::string toString() const
+  {
+    std::stringstream ss;
+    ss << (*this);
+    return ss.str();
   }
 };
 
@@ -32,6 +50,7 @@ private:
 
 public:
   SimulatedDriveTrain(){};
+  SimulatedDriveTrain(const SimulatedRobotState &initialState) : state(initialState){};
 
   pros::c::gps_status_s_t getGPSSensorData() const
   {
@@ -48,13 +67,17 @@ public:
 
   std::pair<double, double> getWheelVelocities() const
   {
-    std::cout << state.yaw << '\n';
     return {state.velL, state.velR};
   }
 
   void tick(double dt)
   {
     state.tick(dt);
+  }
+
+  const SimulatedRobotState &getState() const
+  {
+    return state;
   }
 };
 

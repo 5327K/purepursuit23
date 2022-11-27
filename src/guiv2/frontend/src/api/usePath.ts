@@ -32,9 +32,7 @@ const usePath = (points: Point[]) => {
         pts.push({
           x: parseFloat(line[0]),
           y: parseFloat(line[1]),
-          dist: parseFloat(line[2]),
-          curvature: parseFloat(line[3]),
-          targetV: parseFloat(line[4])
+          targetV: parseFloat(line[2])
         });
       }
 

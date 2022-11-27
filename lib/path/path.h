@@ -14,16 +14,13 @@ class Path
 public:
   using PathVector = std::vector<Waypoint>;
 
-private:
-  const double SPACING = 6;
+  // TODO: make this private & add getters https://discord.com/channels/331718482485837825/1044765159660453929
+  PathVector path;
+  bool forward;
 
-public:
-  const PathVector path;
-  const bool forward;
+  Path(PathVector path, bool forward) : path(path), forward(forward) {}
 
-  Path(const PathVector path, const bool forward) : path(path), forward(forward) {}
-
-#pragma region File / String Input & Output
+#pragma region File / String Input &Output
 
   friend std::ostream &operator<<(std::ostream &os, const Path &p)
   {

@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <limits>
 
 #include "../path/path.h"
 #include "../util/util.h"
@@ -15,9 +16,10 @@ class PurePursuit
 {
 private:
   AbstractDriveTrain &driveTrain;
+  double stuckVel;
 
-  constexpr static double lookaheadDistance = 0.05;
-  constexpr static double robotTrack = 0.254;
+  constexpr static double lookaheadDistance = 30;
+  constexpr static double robotTrack = 25.4;
   constexpr static double feedbackMultiplier = 0.01;
 
   // Limit on number of points to be searched during getClosestPoint.
@@ -26,25 +28,22 @@ private:
 
   std::size_t lastClosestPoint = 0;
 
+public: // TODO: make private
   struct PurePursuitUtil
   {
   public:
     const static std::size_t getClosestPointIndex(const Path &path,
-                                                  const Waypoint &currPos,
-                                                  const std::size_t &currClosestPointIndex)
+                                                  const Waypoint &currPos)
     {
-      const std::size_t searchUntil = closestPointSearchLimit <= 0 ? path.path.size() : std::min(path.path.size(), currClosestPointIndex + closestPointSearchLimit + 1);
-      std::cout << searchUntil << '\n';
+      double minDist = Util::distanceSq(currPos, path.path[0]);
+      std::size_t closestPoint = 0;
 
-      double minDist = Util::distanceSq(currPos, path.path[currClosestPointIndex]);
-      std::size_t closestPoint = currClosestPointIndex;
-
-      for (std::size_t i = currClosestPointIndex + 1; i < path.path.size(); ++i)
+      for (std::size_t i = 0; i < path.path.size(); ++i)
       {
         const double currDist = Util::distanceSq(currPos, path.path[i]);
         if (currDist < minDist)
         {
-          closestPoint = currClosestPointIndex;
+          closestPoint = i;
           minDist = currDist;
         }
       }
@@ -65,8 +64,8 @@ private:
       const double a = d.dot(d);
       const double b = 2 * f.dot(d);
       const double c = f.dot(f) - Util::square(radius);
+      double discriminant = Util::square(b) - (4 * a * c);
 
-      double discriminant = Util::square(b) - 4 * a * c;
       if (discriminant < 0)
       {
         // no intersection, return -1
@@ -77,67 +76,34 @@ private:
       const double t1 = (-b - discriminant) / (2 * a);
       const double t2 = (-b + discriminant) / (2 * a);
 
-      if (t1 >= 0 && t1 <= 1)
+      if (0 <= t1 && t1 <= 1)
         return t1;
 
-      if (t2 >= 0 && t2 <= 1)
+      if (0 <= t2 && t2 <= 1)
         return t2;
 
       return -1;
     }
 
-    const static std::pair<std::optional<const Waypoint>, bool> calculateLookaheadPoint(const Path &path,
-                                                                       const Waypoint &start,
-                                                                       const Waypoint &end,
-                                                                       const Waypoint &currPos,
-                                                                       const double &lookaheadDistance,
-                                                                       const bool &onLastSegment)
-    {
-      const double intersection = circleLineIntersection(start, end, currPos, lookaheadDistance);
-
-      if (intersection == -1 && onLastSegment)
-        return {std::optional<const Waypoint>(path.path[path.path.size() - 1]), true};
-
-      if (intersection == -1)
-        return {std::nullopt, false};
-
-      const Waypoint intersectVec = end - start;
-      const Waypoint segment = intersectVec * intersection;
-      const Waypoint point = start + segment;
-
-      return {std::optional<const Waypoint>(point), false};
-    }
-
     const static std::pair<Waypoint, bool> getLookaheadPoint(const Path &path,
-                                            const Waypoint &currPos,
-                                            const double &lookaheadDistance,
-                                            const std::size_t &closestPointI)
+                                                             const Waypoint &currPos,
+                                                             const double &lookaheadDistance,
+                                                             const std::size_t &closestPointI)
     {
-      // TODO: return index so an end condition can be set properly
-      Waypoint result;
-      bool found = false;
-      bool isLast = false;
 
-      for (int i = closestPointI + 1; i < path.path.size(); ++i)
+      for (int i = path.path.size() - 2; i >= 0; --i)
       {
-        const Waypoint &start = path.path[i - 1];
-        const Waypoint &end = path.path[i];
+        const Waypoint &start = path.path[i];
+        const Waypoint &end = path.path[i + 1];
 
-        const auto [lookaheadPt, isEnd] = calculateLookaheadPoint(path, start, end,
-                                                         currPos, lookaheadDistance,
-                                                         i == path.path.size() - 1);
-        if (lookaheadPt.has_value())
-        {
-          result = *lookaheadPt;
-          found = true;
-          isLast = isEnd;
-          break;
-        }
+        const double intersection = circleLineIntersection(start, end, currPos, lookaheadDistance);
+        if (intersection == -1)
+          continue;
+
+        return {start + (end - start) * intersection, false};
       }
 
-      assert(("Did not find lookahead point! This should never happen.", found == true));
-
-      return {result, isLast};
+      return {path.path[closestPointI], false};
     }
 
     const static double calculateCurvatureOfArc(const Path &path,
@@ -146,14 +112,16 @@ private:
                                                 const Waypoint &lookahead,
                                                 const double &lookaheadDistance)
     {
-      const double a = -std::tan(heading);
+      const double translated = Util::PI / 2 - heading;
+
+      const double a = -std::tan(translated);
       const double b = 1;
-      const double c = (std::tan(heading) * currPos.x) - currPos.y;
+      const double c = (std::tan(translated) * currPos.x) - currPos.y;
 
       const double x = std::abs(a * lookahead.x + b * lookahead.y + c) / std::sqrt(Util::square(a) + Util::square(b));
 
-      const double cross = (std::sin(heading) * (lookahead.x - currPos.x)) - (std::cos(heading) * (lookahead.y - currPos.y));
-      const double side = cross > 0 ? 1 : -1; // signum function = sign of cross
+      const double cross = (std::sin(translated) * (lookahead.x - currPos.x)) - (std::cos(translated) * (lookahead.y - currPos.y));
+      const double side = cross > 0 ? 1 : (cross < 0 ? -1 : 0); // signum function = sign of cross
 
       const double curvature = (2 * x) / (Util::square(lookaheadDistance));
       return curvature * side;
@@ -161,23 +129,47 @@ private:
 
     const static double calculateLeftWheelTargetVelocity(const double &targetRobotVelocity,
                                                          const double &robotTrack,
-                                                         const double &curvature)
+                                                         const double &curvature,
+                                                         const double &stuckVel)
     {
-      return targetRobotVelocity * ((2 + (robotTrack * curvature))) / 2;
+      const double result = targetRobotVelocity * (2 + (robotTrack * curvature)) / 2;
+      return std::isnan(result) || result == 0 ? stuckVel : result;
     }
 
     const static double calculateRightWheelTargetVelocity(const double &targetRobotVelocity,
                                                           const double &robotTrack,
-                                                          const double &curvature)
+                                                          const double &curvature,
+                                                          const double &stuckVel)
     {
-      return targetRobotVelocity * ((2 - (robotTrack * curvature))) / 2;
+      const double result = targetRobotVelocity * (2 - (robotTrack * curvature)) / 2;
+      return std::isnan(result) || result == 0 ? stuckVel : result;
     }
   };
 
 public:
-  PurePursuit(AbstractDriveTrain &driveTrain) : driveTrain(driveTrain){};
+  PurePursuit(AbstractDriveTrain &driveTrain, double stuckVel) : driveTrain(driveTrain), stuckVel(stuckVel){};
 
-  bool tick(const Path &path, int &closestPt);
+  struct TickData
+  {
+    bool ended;
+    Waypoint lookaheadPt;
+    double curvature;
+
+    friend std::ostream &operator<<(std::ostream &os, const TickData &p)
+    {
+      os << p.lookaheadPt.x << ' ' << p.lookaheadPt.y << ' ' << p.lookaheadPt.curvature << ' ' << p.curvature;
+      return os;
+    }
+
+    std::string toString() const
+    {
+      std::stringstream ss;
+      ss << (*this);
+      return ss.str();
+    }
+  };
+
+  TickData tick(const Path &path);
   void follow(const Path &path);
 };
 

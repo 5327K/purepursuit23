@@ -9,6 +9,7 @@ const CanvasPoint = ({
   setPoints,
   selected,
   setSelected,
+  draggable
 }: {
   index: number;
   fieldSize: number;
@@ -16,16 +17,17 @@ const CanvasPoint = ({
   setSelected: (selected: number | null) => void;
   points: Point[];
   setPoints: (points: Point[]) => void;
+  draggable: boolean
 }) => {
   return (
     <Circle
-      radius={fieldSize / 80}
-      fill="red"
-      stroke={selected === index ? "white" : "black"}
-      strokeWidth={selected === index ? fieldSize / 250 : fieldSize / 300}
+      radius={index === 0 || index === points.length - 1 ? fieldSize / 80 : fieldSize / 90}
+      fill={!draggable ? "rgb(82 82 91)" : (index === 0 ? "rgb(34 197 94)" : (index === points.length - 1 ? "red" : "rgb(234 179 8)"))}
+      stroke={draggable && selected === index ? "yellow" : "white"}
+      strokeWidth={draggable && selected === index ? fieldSize / 250 : fieldSize / 300}
       x={mToPX(points[index].x, fieldSize)}
       y={mToPX(-points[index].y, fieldSize)}
-      draggable={true}
+      draggable={draggable}
       dragBoundFunc={(pos) => {
         return {
           x: clamp(pos.x, 0, fieldSize),

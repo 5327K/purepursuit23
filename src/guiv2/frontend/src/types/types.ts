@@ -6,7 +6,19 @@ export interface Point {
 export interface Waypoint {
   x: number;
   y: number;
-  dist: number;
-  curvature: number;
   targetV: number;
+}
+
+export interface RobotState {
+  x: number;
+  y: number;
+  yaw: number;
+  velL: number;
+  velR: number;
+}
+
+export interface VisData {
+  x: number;
+  y: number;
+  curvature: number;
 }

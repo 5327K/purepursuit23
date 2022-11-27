@@ -1,14 +1,18 @@
 import { createContext, useState, Context } from "react";
 import Api from "./api/api";
+import Alert from "./components/Alert";
 import Field from "./components/Field";
 
 const api = new Api();
 export const ApiContext = createContext(api);
 
+// TODO: make alert work
+
 const App = () => {
   return (
     <ApiContext.Provider value={api}>
       <div className="w-full h-full max-h-full bg-slate-900 p-8 flex flex-col space-y-5">
+        {/* <Alert>HELP ME</Alert> */}
         <h1 className="text-6xl text-white text-center">
           5327K's Path Planner
         </h1>

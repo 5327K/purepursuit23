@@ -19,29 +19,27 @@ private:
   struct PathBuilderUtil
   {
   private:
-    static double calcPathCurvature(const PathVector &path, const std::size_t &i)
+    static double calcPathCurvature(PathVector &path, const std::size_t &i)
     {
-      const Waypoint &P = path[i - 1];
-      const Waypoint &Q = path[i];
+      const auto &sq = Util::square;
+
+      path[i].x += 0.0001;
+      path[i].y += 0.0001;
+
+      const Waypoint &Q = path[i - 1];
+      const Waypoint &P = path[i];
       const Waypoint &R = path[i + 1];
 
-      const double PQ = Util::distance(P, Q);
-      const double QR = Util::distance(Q, R);
-      const double RP = Util::distance(R, P);
+      const double &x1 = P.x, &y1 = P.y;
+      const double &x2 = Q.x, &y2 = Q.y;
+      const double &x3 = R.x, &y3 = R.y;
 
-      const double productOfSides = PQ * QR * RP;
-      const double semiPerimeter = (PQ + QR + RP) / 2;
-      const double triangleArea = std::sqrt(semiPerimeter *
-                                            (semiPerimeter - PQ) *
-                                            (semiPerimeter - QR) *
-                                            (semiPerimeter - RP));
-
-      const double radius = productOfSides / (triangleArea * 4);
-
-      // If radius is infinity/NaN, then the curvature is 0 (straight line).
-      const double curvature = std::isinf(radius) || std::isnan(radius) ? 0 : 1 / radius;
-
-      assert((!std::isnan(curvature), "Curvature cannot be NaN!"));
+      const double k1 = 0.5 * (sq(x1) + sq(y1) - sq(x2) - sq(y2)) / (x1 - x2);
+      const double k2 = (y1 - y2) / (x1 - x2);
+      const double b = 0.5 * (sq(x2) - 2 * x2 * k1 + sq(y2) - sq(x3) + 2 * x3 * k1 - sq(y3)) / (x3 * k2 - y3 + y2 - x2 * k2);
+      const double a = k1 - k2 * b;
+      const double r = std::sqrt(sq(x1 - a) + sq(y1 - b));
+      const double curvature = 1 / r;
 
       return curvature;
     }
@@ -94,7 +92,7 @@ private:
           const Waypoint &nextPoint = newPath[i + 1];
 
           Waypoint &currPoint = newPath[i];
-          auto currXCopy = currPoint.x, currYCopy = currPoint.y;
+          double currXCopy = currPoint.x, currYCopy = currPoint.y;
 
           currPoint.x += a * (oldPoint.x - currPoint.x) +
                          b * (prevPoint.x + nextPoint.x - 2 * currPoint.x);
@@ -125,8 +123,8 @@ private:
     {
       PathVector newPath(path);
 
-      newPath[0].curvature = 0;
-      newPath.back().curvature = 0;
+      newPath[0].curvature = 0.0001;
+      newPath.back().curvature = 0.0001;
 
       for (std::size_t i = 1; i < path.size() - 1; ++i)
         newPath[i].curvature = calcPathCurvature(newPath, i);
@@ -137,17 +135,33 @@ private:
     static void setTargetVel(PathVector &path, const double &maxVel,
                              const double &maxAccel, const double &k)
     {
-      path.back().targetV = 0;
+      std::vector<double> maxVelAtPt(path.size());
 
+      for (int i = 0; i < path.size(); ++i)
+      {
+        assert(path[i].curvature != -1);
+        maxVelAtPt[i] = std::min(maxVel, k / path[i].curvature);
+      }
+
+      path.back().targetV = 0;
       for (int i = path.size() - 2; i >= 0; --i)
       {
         const double dist = Util::distance(path[i + 1], path[i]);
-        const double maxReachableVel = std::sqrt(Util::square(path[i + 1].targetV) +
-                                                 2 * maxAccel * dist);
-        const double maxVelocity =
-            i == 0 ? maxVel : std::min(maxVel, k / calcPathCurvature(path, i));
+        const double accelLimit = std::min(maxVelAtPt[i], std::sqrt(Util::square(path[i + 1].targetV) + 2 * maxAccel * dist));
+        path[i].targetV = accelLimit;
+      }
 
-        path[i].targetV = std::min(maxVelocity, maxReachableVel);
+      // TODO: allow starting velocity (apart from 0)
+      path[0].targetV = 0;
+      for (int i = 1; i < path.size(); ++i)
+      {
+        const double dist = Util::distance(path[i - 1], path[i]);
+        const double newVel = std::sqrt(Util::square(path[i - 1].targetV) + 2 * maxAccel * dist);
+
+        if (newVel < path[i].targetV)
+          path[i].targetV = newVel;
+        else
+          break;
       }
     }
   };
@@ -158,7 +172,7 @@ private:
   // defaults to values from PDF
 
   // defaults to about 6 inches (in meters)
-  double spacing = 0.1524;
+  double spacing = 15.24;
 
   double tolerance = 0.001;
 

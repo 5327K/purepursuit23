@@ -4,7 +4,7 @@ class Api {
   private socket: WebSocket;
   private connected = false;
 
-  private readonly possibleReponses = ["updated-path"];
+  private readonly possibleReponses = ["updated-path", "simulation-part", "simulation-end"];
 
   public readonly callbacks: {
     [key in typeof this.possibleReponses[number]]: ((
@@ -55,6 +55,14 @@ class Api {
       throw new Error(`Unrecognized message recieved. Message: ${msg}`);
     }
   };
+
+  public startSimulation = () => {
+    this.socket.send("start-simulation");
+  }
+
+  public cancelSimulation = () => {
+    this.socket.send("cancel-simulation");
+  }
 
   public pathUpdated = (
     forwards: boolean,
