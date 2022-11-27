@@ -19,9 +19,10 @@ const Field = () => {
   const [fieldSize, setFieldSize] = useState<number>(1000);
 
   const [points, setPoints] = useState<Point[]>([
-    { x: -90, y: 70 },
-    { x: 90, y: 70 },
-    { x: 90, y: -70 },
+    { x: -121.8898, y: -29.2126 },
+    { x: -17.7165, y: 82.0473 },
+    { x: 9.9213, y: -88.4252 },
+    { x: 106.2992, y: 35.5906 },
   ]);
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -67,7 +68,7 @@ const Field = () => {
       ref={wrapper}
     >
       <div className="absolute top-1/2 translate-y-[-50%] flex flex-col space-y-5">
-        <Stage ref={(ref) => setStage(ref)}>
+        <Stage ref={(ref) => setStage(ref)} className="border-gray-700 border-2">
           <Layer>
             {/* TODO: Add darkness to background to make it easier to see */}
             <KonvaImage
@@ -90,20 +91,14 @@ const Field = () => {
               <Circle
                 radius={fieldSize / 150}
                 // TODO: remove hardcoded maxVal
-                fill={`rgb(200, ${(1 - pt.targetV / 100) * 255}, ${(1 - pt.targetV / 100) * 255})`}
+                fill={`rgb(${(1 - pt.targetV / 100) * 255}, 0, ${
+                  (pt.targetV / 100) * 255
+                })`}
                 key={idx}
                 x={mToPX(pt.x, fieldSize)}
                 y={mToPX(-pt.y, fieldSize)}
               />
             ))}
-
-            {simulatedPath && visData && (
-              <CurvatureCircle
-                robotState={simulatedPath[simulatedPath.length - 1]}
-                visData={visData}
-                fieldSize={fieldSize}
-              />
-            )}
 
             {simulatedPath && visData && (
               <Robot
@@ -113,10 +108,18 @@ const Field = () => {
               />
             )}
 
+            {simulatedPath && visData && (
+              <CurvatureCircle
+                robotState={simulatedPath[simulatedPath.length - 1]}
+                visData={visData}
+                fieldSize={fieldSize}
+              />
+            )}
+
             {visData && (
               <Circle
                 radius={fieldSize / 100}
-                fill="purple"
+                fill="green"
                 x={mToPX(visData.x, fieldSize)}
                 y={mToPX(-visData.y, fieldSize)}
               />
@@ -139,44 +142,6 @@ const Field = () => {
           </Layer>
         </Stage>
 
-        <div className="w-full flex flex-row items-center justify-evenly space-x-2">
-          <div className="flex flex-row space-x-2 items-center">
-            <InputField
-              label="X:"
-              value={
-                !simulationRunning && selected !== null
-                  ? points[selected].x.toFixed(4)
-                  : ""
-              }
-              setValue={(value) => {
-                if (!selected) return;
-                const copy = points.slice();
-                copy[selected].x = parseFloat(value);
-                setPoints(copy);
-              }}
-              disabled={selected === null || simulationRunning}
-            />
-            <p className="block text-md md:text-lg text-gray-300">m</p>
-          </div>
-          <div className="flex flex-row space-x-2 items-center">
-            <InputField
-              label="Y:"
-              value={
-                !simulationRunning && selected !== null
-                  ? points[selected].y.toFixed(4)
-                  : ""
-              }
-              setValue={(value) => {
-                if (!selected) return;
-                const copy = points.slice();
-                copy[selected].y = parseFloat(value);
-                setPoints(copy);
-              }}
-              disabled={selected === null || simulationRunning}
-            />
-            <p className="block text-md md:text-lg text-gray-300">m</p>
-          </div>
-        </div>
         <button
           type="button"
           className={`self-center w-52 text-white focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 ${

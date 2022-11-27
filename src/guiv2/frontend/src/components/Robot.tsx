@@ -16,44 +16,44 @@ const Robot = ({
       <Rect
         x={mToPX(robotState.x, fieldSize)}
         y={mToPX(-robotState.y, fieldSize)}
-        offsetX={25}
-        offsetY={25}
+        offsetX={20}
+        offsetY={20}
         rotation={(robotState.yaw / Math.PI) * 180}
-        width={50}
-        height={50}
-        stroke="black"
+        width={40}
+        height={40}
+        stroke="green"
         fill="black"
         opacity={0.8}
       />
 
-      <Circle
-        x={mToPX(robotState.x, fieldSize)}
-        y={mToPX(-robotState.y, fieldSize)}
-        radius={8}
-        fill="orange"
-      />
-
       <Rect
         x={mToPX(robotState.x, fieldSize)}
         y={mToPX(-robotState.y, fieldSize)}
-        offsetX={26}
-        offsetY={25}
+        offsetX={21}
+        offsetY={20}
         rotation={(robotState.yaw / Math.PI) * 180}
         width={2}
-        height={(-robotState.velL / 100) * 30} // TODO: rmoeve hardcoded velocity
+        height={(-robotState.velL / 100) * 50} // TODO: rmoeve hardcoded velocity
         fill="red"
       />
 
       <Rect
         x={mToPX(robotState.x, fieldSize)}
         y={mToPX(-robotState.y, fieldSize)}
-        offsetX={-23}
-        offsetY={25}
+        offsetX={-19}
+        offsetY={20}
         rotation={(robotState.yaw / Math.PI) * 180}
         width={2}
-        height={(-robotState.velR / 100) * 30} // TODO: rmoeve hardcoded velocity
+        height={(-robotState.velR / 100) * 50} // TODO: rmoeve hardcoded velocity
         fill="red"
       />
+
+      {/* <Circle
+        x={mToPX(robotState.x, fieldSize)}
+        y={mToPX(-robotState.y, fieldSize)}
+        radius={Math.sqrt(2 * 20 * 20)}
+        stroke="green"
+      /> */}
     </>
   );
 };
