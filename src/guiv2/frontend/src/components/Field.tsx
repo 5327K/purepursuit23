@@ -4,7 +4,7 @@ import Konva from "konva";
 import { Circle, Image as KonvaImage, Layer, Stage } from "react-konva";
 
 import fieldImagePath from "../assets/field-full-bg.png";
-import { Point } from "../types/types";
+import { Point, RobotState } from "../types/types";
 import InputField from "./InputField";
 import CanvasPoint from "./CanvasPoint";
 import usePath from "../api/usePath";
@@ -13,7 +13,13 @@ import useSimulation from "../api/useSimulation";
 import Robot from "./Robot";
 import CurvatureCircle from "./CurvatureCircle";
 
-const Field = () => {
+const Field = ({
+  setStateData,
+}: {
+  setStateData: (
+    stateData: RobotState
+  ) => void;
+}) => {
   const wrapper = useRef<HTMLDivElement | null>(null);
   const [stage, setStage] = useState<Konva.Stage | null>(null);
   const [fieldSize, setFieldSize] = useState<number>(1000);
@@ -32,6 +38,12 @@ const Field = () => {
 
   const fieldImage = new Image();
   fieldImage.src = fieldImagePath;
+
+  useEffect(() => {
+    if (simulatedPath.length === 0) return;
+
+    setStateData(simulatedPath[simulatedPath.length - 1]);
+  }, [simulatedPath]);
 
   useEffect(() => {
     if (!wrapper?.current) return;
@@ -68,7 +80,10 @@ const Field = () => {
       ref={wrapper}
     >
       <div className="absolute top-1/2 translate-y-[-50%] flex flex-col space-y-5">
-        <Stage ref={(ref) => setStage(ref)} className="border-gray-700 border-2">
+        <Stage
+          ref={(ref) => setStage(ref)}
+          className="border-gray-700 border-2"
+        >
           <Layer>
             {/* TODO: Add darkness to background to make it easier to see */}
             <KonvaImage
