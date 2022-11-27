@@ -25,13 +25,13 @@ const App = () => {
         {/* <Alert>HELP ME</Alert> */}
 
         <div className="flex flex-col justify-center items-center grow shrink">
-          <div className="flex flex-row space-x-2 2xl:w-[1500px] md:w-[800px] sm:w-[600px] w-[400px] grow shrink">
+          <div className="flex flex-row space-x-2 md:w-[800px] sm:w-[600px] w-[400px] grow shrink">
             <div className="flex flex-col justify-center items-center space-y-5 w-7/12">
               <Field setStateData={setStateData} />
             </div>
             <div className="flex flex-col w-5/12 grow shrink bg-gray-700 rounded-xl p-4 pt-8">
               <h1 className="text-3xl text-yellow-500 text-center">
-                5327K's Path Planner
+                5327K's Adaptive Pure Pursuit Controller
               </h1>
               <br />
               {stateData && (
@@ -87,32 +87,30 @@ const App = () => {
               <hr className="border-dashed" />
               <br />
 
-              <p className="text-white">
+              <p className="text-white mb-4">
                 Pure Pursuit is an algorithm that uses advanced{" "}
-                <span className="text-yellow-500 font-bold">
+                <span className="text-teal-500 font-bold">
                   geometric and trignometric
                 </span>{" "}
                 math, allowing a robot to{" "}
-                <span className="text-yellow-500 font-bold">autonomously</span>{" "}
+                <span className="text-teal-500 font-bold">autonomously</span>{" "}
                 follow a path efficiently.
               </p>
 
-              <br />
-
               <p className="ml-4 mb-2 text-white text-sm">
                 <span className="text-white font-bold">A)</span> Finds closest
-                point to robot on path for it to target (aka the lookahead
-                point).
+                point to robot on path for it to target (aka the <span className="text-teal-500 font-bold">lookahead
+                point</span>).
               </p>
               <p className="ml-4 mb-2 text-white text-sm">
                 <span className="text-white font-bold">B)</span> Calculates the
-                optimal curvature for the robot to turn to reach the lookahead
+                optimal <span className="text-teal-500 font-bold">curvature</span> for the robot to turn to reach the lookahead
                 point.
               </p>
               <p className="ml-4 mb-2 text-white text-sm">
                 <span className="text-white font-bold">C)</span> Computes the
                 velocities of the left and right wheels using the{" "}
-                <span className="text-yellow-500 font-bold">
+                <span className="text-teal-500 font-bold">
                   skid steer kinematic model
                 </span>
                 .
