@@ -3,6 +3,8 @@
 !*.*
 !*/
 
+!Makefile
+
 .vscode
 
 include
